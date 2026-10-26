@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#a9ca83" />
+  <meta name="description" content="A little birthday garden to wander through." />
+  <title>Birthday Garden</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="collectibles.css" />
+</head>
+
+<body>
+  <main class="full-garden" aria-label="Birthday garden">
+    <div class="viewport" id="viewport">
+      <canvas id="garden"
+        aria-label="A garden you can explore. Use the arrow keys or direction buttons to walk."></canvas>
+      <div id="item-prompt" class="item-prompt" hidden>
+        <p><span class="prompt-emoji">✨</span> You found a <strong id="found-item-name"></strong>!<br />Would you like to collect?</p>
+        <button id="collect-item" type="button">Collect</button>
+      </div>
+      <button id="collection-toggle" class="collection-toggle" type="button" hidden aria-label="Open your collection">
+        <span aria-hidden="true">🎁</span> Collection <span id="collection-count" class="collection-count"></span>
+      </button>
+      <div id="surprise-modal" class="surprise-modal" hidden>
+        <section class="surprise-card" role="dialog" aria-modal="true" aria-label="Collected birthday wish">
+          <div id="surprise-content"></div>
+          <button id="confirm-surprise" class="modal-ok" type="button">OK</button>
+        </section>
+      </div>
+      <div class="controls" aria-label="Movement controls">
+        <button class="move up" data-dir="up" aria-label="Walk up">&uarr;</button>
+        <button class="move left" data-dir="left" aria-label="Walk left">&larr;</button>
+        <button class="move down" data-dir="down" aria-label="Walk down">&darr;</button>
+        <button class="move right" data-dir="right" aria-label="Walk right">&rarr;</button>
+      </div>
+    </div>
+  </main>
+  <script src="garden.js"></script>
+</body>
+
+</html>
