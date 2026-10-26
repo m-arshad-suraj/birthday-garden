@@ -8,6 +8,8 @@
   const rabbitCountInput=document.querySelector('#rabbit-count');
   const productNameInput=document.querySelector('#collectible-name'),productEmojiInput=document.querySelector('#collectible-emoji'),productWishInput=document.querySelector('#collectible-wish');
   const productNameRow=document.querySelector('#collectible-name-row'),productEmojiRow=document.querySelector('#collectible-emoji-row'),productWishRow=document.querySelector('#collectible-wish-row');
+  const positionXRow=document.querySelector('#position-x-row'),positionYRow=document.querySelector('#position-y-row');
+  const selectionPrompt=document.querySelector('#selection-prompt'),inspectorHelp=document.querySelector('#inspector-help');
   const deleteButton=document.querySelector('#delete-object');
   const clone=data=>JSON.parse(JSON.stringify(data));
   const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
@@ -150,8 +152,9 @@
     const obj=selectedObject(),name=document.querySelector('#selected-name'),sizeRow=document.querySelector('#object-size-row');
     const isCollectible=selected?.type==='collectible';
     productNameRow.hidden=productEmojiRow.hidden=productWishRow.hidden=!isCollectible;
-    deleteButton.disabled=!selected||selected.type==='start';
-    if(!obj){name.textContent='Nothing selected';xInput.value='';yInput.value='';xInput.disabled=yInput.disabled=sizeInput.disabled=true;sizeRow.hidden=true;productNameInput.value=productEmojiInput.value=productWishInput.value='';draw();return}
+    deleteButton.disabled=!obj||selected.type==='start';
+    if(!obj){selectionPrompt.hidden=false;inspectorHelp.hidden=false;name.hidden=true;positionXRow.hidden=positionYRow.hidden=true;xInput.value='';yInput.value='';xInput.disabled=yInput.disabled=sizeInput.disabled=true;sizeRow.hidden=true;productNameInput.value=productEmojiInput.value=productWishInput.value='';draw();return}
+    selectionPrompt.hidden=true;inspectorHelp.hidden=true;name.hidden=false;positionXRow.hidden=positionYRow.hidden=false;
     name.textContent=selected.type==='house'?'House selected':selected.type==='tree'?'Tree selected':selected.type==='flowerBed'?'Flower bed selected':isCollectible?'Collectible selected':'Player starting position';
     xInput.disabled=yInput.disabled=false;xInput.value=Math.round(obj.x);yInput.value=Math.round(obj.y);
     const hasSize=selected.type==='tree'||selected.type==='flowerBed';sizeRow.hidden=!hasSize;sizeInput.disabled=!hasSize;
