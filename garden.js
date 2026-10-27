@@ -4,24 +4,35 @@
   let ctx = canvas.getContext('2d');
   const viewport = document.querySelector('#viewport');
   const world = { w: 4200, h: 2800, scale: .9 };
-  const player = { x: Number(layout.playerStart.x), y: Number(layout.playerStart.y), speed: 3.2, facing: 'right', step: 0 };
+  const playerPositionStorageKey='birthday-garden-player-position-v1';
+  let savedPlayerPosition=null;try{const saved=JSON.parse(localStorage.getItem(playerPositionStorageKey)||'null');if(Number.isFinite(Number(saved?.x))&&Number.isFinite(Number(saved?.y)))savedPlayerPosition={x:Math.max(35,Math.min(world.w-35,Number(saved.x))),y:Math.max(40,Math.min(world.h-20,Number(saved.y)))}}catch{}
+  const player = { x: savedPlayerPosition?.x??Number(layout.playerStart.x), y: savedPlayerPosition?.y??Number(layout.playerStart.y), speed: 3.2, facing: 'right', step: 0 };
   const missionCircles=(Array.isArray(layout.missionCircles)?layout.missionCircles:layout.missionCircle?[{id:1,...layout.missionCircle}]:[]).map((marker,index)=>({id:Number(marker.id)||index+1,x:Number(marker.x)||0,y:Number(marker.y)||0,radius:Math.max(24,Number(marker.radius)||92),color:marker.color||'#50e890'}));
   const camera = { x: 0, y: 0 };
+  const missionDefinitions=layout.missions||{},missionScreen=document.querySelector('#mission-screen');
+  const missionStorageKey='birthday-garden-missions-v1';
+  let activeMission=false;
+  const missionInsideIds=new Set(),missionScriptLoads=new Map(),missionStyleLoads=new Map();
+  let completedMissions=new Map();try{const saved=JSON.parse(localStorage.getItem(missionStorageKey)||'[]');if(Array.isArray(saved))for(const record of saved){const key=String(typeof record==='string'?record:record?.key??'');if(!key)continue;const config=missionDefinitions[key]||{};completedMissions.set(key,{key,name:typeof record==='object'&&record?.name||config.name||key,wish:typeof record==='object'&&record?.wish||config.successMessage||''})}}catch{}
   const dragToPan=layout.dragToPan===true;
   let cameraDragged=false,activePan=null;
   const held = new Set();
   const collectibles=(layout.collectibles||[]).map((item,index)=>({id:Number(item.id)||index+1,x:Number(item.x),y:Number(item.y),emoji:item.emoji||'🎁',name:item.name||'Garden surprise',wish:item.wish||'A little birthday wish, just for you.'}));
   const itemPrompt=document.querySelector('#item-prompt'),foundItemName=document.querySelector('#found-item-name'),collectItemButton=document.querySelector('#collect-item');
-  const collectionToggle=document.querySelector('#collection-toggle'),collectionCount=document.querySelector('#collection-count');
+  const collectionToggle=document.querySelector('#collection-toggle'),collectionCount=document.querySelector('#collection-count'),wishesToggle=document.querySelector('#wishes-toggle'),wishesCount=document.querySelector('#wishes-count');
   const surpriseModal=document.querySelector('#surprise-modal'),surpriseContent=document.querySelector('#surprise-content');
   const collectionStorageKey='birthday-garden-collection-v1';
   const welcomeStorageKey='birthday-garden-welcome-seen-v1';
   const welcomeScreen=document.querySelector('#welcome-screen'),welcomeExplore=document.querySelector('#welcome-explore'),welcomeContinue=document.querySelector('#welcome-continue'),welcomeRestart=document.querySelector('#welcome-restart');
   let gameStarted=false;
-  let hasVisited=false;try{hasVisited=localStorage.getItem(welcomeStorageKey)==='true'||localStorage.getItem(collectionStorageKey)!==null}catch{}
+  let hasVisited=!!savedPlayerPosition;try{hasVisited=hasVisited||localStorage.getItem(welcomeStorageKey)==='true'||localStorage.getItem(collectionStorageKey)!==null}catch{}
   welcomeExplore.hidden=hasVisited;welcomeContinue.hidden=welcomeRestart.hidden=!hasVisited;
   let collectedIds=new Set(),nearbyCollectible=null;
   try{const saved=JSON.parse(localStorage.getItem(collectionStorageKey)||'[]');if(Array.isArray(saved))collectedIds=new Set(saved.map(String))}catch{}
+  function savePlayerPosition(){
+    savedPlayerPosition={x:player.x,y:player.y};
+    try{localStorage.setItem(playerPositionStorageKey,JSON.stringify(savedPlayerPosition))}catch{}
+  }
   let width = 0, height = 0, dpr = 1, lastTime = 0, moved = false;
   const rand = (seed) => { const n = Math.sin(seed * 127.1 + 311.7) * 43758.5453; return n - Math.floor(n); };
   const colors = ['#fff4dc','#f5d3c9','#f0e79b','#d9e8bf','#fff9ed','#d6dceb'];
@@ -296,14 +307,31 @@
     }
     surpriseContent.append(title,subtitle,list);showSurpriseModal();
   }
+  function showWishes(){
+    surpriseContent.replaceChildren();
+    const wishes=[...completedMissions.values()];
+    const title=document.createElement('h2');title.className='collection-heading';title.id='surprise-title';title.textContent='Wishes';
+    const subtitle=document.createElement('p');subtitle.className='collection-subtitle';subtitle.textContent=`${wishes.length} little promise${wishes.length===1?'':'s'} to keep`;
+    const list=document.createElement('div');list.className='collection-items';
+    for(const wish of wishes){
+      const entry=document.createElement('article');entry.className='collection-entry';
+      const emoji=document.createElement('span');emoji.className='collection-entry-emoji';emoji.textContent='💌';
+      const name=document.createElement('strong');name.textContent=wish.name;
+      const message=document.createElement('p');message.textContent=wish.wish;
+      entry.append(emoji,name,message);list.append(entry);
+    }
+    surpriseContent.append(title,subtitle,list);showSurpriseModal();
+  }
   function updateCollectionToggle(){
     const count=collectibles.filter(item=>collectedIds.has(String(item.id))).length;
-    collectionToggle.hidden=!gameStarted||count===0;collectionCount.textContent=`${count}/${collectibles.length}`;
+    collectionToggle.hidden=!gameStarted||activeMission||count===0;collectionCount.textContent=`${count}/${collectibles.length}`;
+    const missionKeys=Object.keys(missionDefinitions),wishCount=missionKeys.filter(key=>completedMissions.has(key)).length,totalMissions=missionKeys.length;wishesToggle.hidden=!gameStarted||activeMission||wishCount===0;wishesCount.textContent=`${wishCount}/${totalMissions}`;
   }
   function beginGame(fromScratch=false){
     if(fromScratch){
       try{for(let i=localStorage.length-1;i>=0;i--){const key=localStorage.key(i);if(key!==welcomeStorageKey)localStorage.removeItem(key)}}catch{}
-      collectedIds.clear();
+      collectedIds.clear();completedMissions.clear();missionInsideIds.clear();
+      player.x=Number(layout.playerStart.x);player.y=Number(layout.playerStart.y);savedPlayerPosition=null;
     }
     try{localStorage.setItem(welcomeStorageKey,'true')}catch{}
     gameStarted=true;welcomeScreen.hidden=true;cameraDragged=false;updateCollectionToggle();updateCollectiblePrompt();
@@ -311,8 +339,72 @@
   welcomeExplore.addEventListener('click',()=>beginGame());
   welcomeContinue.addEventListener('click',()=>beginGame());
   welcomeRestart.addEventListener('click',()=>beginGame(true));
+  function loadMissionStyle(file){
+    if(!file)return Promise.resolve();
+    if(missionStyleLoads.has(file))return missionStyleLoads.get(file);
+    const promise=new Promise((resolve,reject)=>{const link=document.createElement('link');link.rel='stylesheet';link.href=file;link.dataset.missionStyle=file;link.onload=resolve;link.onerror=()=>reject(new Error(`Could not load mission styles: ${file}`));document.head.append(link)});
+    missionStyleLoads.set(file,promise);return promise;
+  }
+  function loadMissionScript(file){
+    if(missionScriptLoads.has(file))return missionScriptLoads.get(file);
+    const promise=new Promise((resolve,reject)=>{const script=document.createElement('script');script.src=file;script.dataset.missionCode=file;script.onload=resolve;script.onerror=()=>reject(new Error(`Could not load mission code: ${file}`));document.body.append(script)});
+    missionScriptLoads.set(file,promise);return promise;
+  }
+  function leaveMission(){activeMission=false;missionScreen.hidden=true;missionScreen.replaceChildren();held.clear();updateCollectionToggle();updateCollectiblePrompt()}
+  function showMissionSuccess(mission,result){
+    surpriseContent.replaceChildren();
+    const emoji=document.createElement('span');emoji.className='wish-emoji';emoji.textContent='💞';
+    const kicker=document.createElement('p');kicker.className='wish-kicker';kicker.textContent='PIECE BY PIECE';
+    const title=document.createElement('h2');title.className='wish-title';title.textContent=mission.name||result.taskName||'A life together';
+    const message=document.createElement('p');message.className='wish-copy';message.textContent=result.message||mission.successMessage||'Piece by piece, we’ll build our life together. Every little moment with you is a piece I want to keep.';
+    surpriseContent.append(emoji,kicker,title,message);showSurpriseModal();
+  }
+  function showMissionLoading(mission){
+    const panel=document.createElement('section');panel.className='mission-loading';
+    const title=document.createElement('h1');title.textContent=mission.name||'Your mission';
+    const text=document.createElement('p');text.textContent='Getting your little puzzle ready…';
+    const back=document.createElement('button');back.type='button';back.className='mission-loading-back';back.textContent='← Back to garden';back.addEventListener('click',leaveMission);
+    panel.append(back,title,text);missionScreen.replaceChildren(panel);
+  }
+  async function launchMission(taskKey,mission){
+    if(activeMission||completedMissions.has(String(taskKey)))return;
+    activeMission=true;held.clear();itemPrompt.hidden=true;updateCollectionToggle();missionScreen.hidden=false;showMissionLoading(mission);
+    try{
+      await Promise.all([loadMissionStyle(mission.styleFile),loadMissionScript(mission.codeFile)]);
+      if(!activeMission)return;
+      const startTask=window[mission.functionName];if(typeof startTask!=='function')throw new Error(`Mission function not found: ${mission.functionName}`);
+      await startTask(missionScreen,{config:mission,onBack:leaveMission,onComplete:result=>{
+        completedMissions.set(String(taskKey),{key:String(taskKey),name:mission.name||result?.taskName||String(taskKey),wish:result?.message||mission.successMessage||''});try{localStorage.setItem(missionStorageKey,JSON.stringify([...completedMissions.values()]))}catch{}savePlayerPosition();
+        leaveMission();showMissionSuccess(mission,result||{});
+      }});
+    }catch(error){
+      if(!activeMission)return;
+      const panel=document.createElement('section');panel.className='mission-loading';
+      const title=document.createElement('h1');title.textContent='This mission needs a moment';
+      const text=document.createElement('p');text.textContent=error.message;
+      const back=document.createElement('button');back.type='button';back.className='mission-loading-back';back.textContent='← Back to garden';back.addEventListener('click',leaveMission);
+      panel.append(back,title,text);missionScreen.replaceChildren(panel);
+    }
+  }
+  function updateMissionTriggers(){
+    if(!gameStarted||activeMission||!surpriseModal.hidden)return;
+    const nowInside=new Set();
+    for(const marker of missionCircles){
+      const inside=((player.x-marker.x)/marker.radius)**2+((player.y-marker.y)/(marker.radius*.55))**2<=1;
+      if(!inside)continue;
+      nowInside.add(marker.id);
+      if(missionInsideIds.has(marker.id))continue;
+      const entry=Object.entries(missionDefinitions).find(([,mission])=>Number(mission.missionCircleId)===marker.id);
+      if(entry&&!completedMissions.has(String(entry[0]))){launchMission(entry[0],entry[1]);break}
+    }
+    missionInsideIds.clear();for(const id of nowInside)missionInsideIds.add(id);
+  }
+  function missionCircleComplete(circleId){
+    const linked=Object.entries(missionDefinitions).filter(([,mission])=>Number(mission.missionCircleId)===circleId);
+    return linked.length>0&&linked.every(([key])=>completedMissions.has(String(key)));
+  }
   function updateCollectiblePrompt(){
-    if(!gameStarted){itemPrompt.hidden=true;return}
+    if(!gameStarted||activeMission){itemPrompt.hidden=true;return}
     if(!surpriseModal.hidden){itemPrompt.hidden=true;return}
     let closest=null,distance=86;
     for(const item of collectibles){
@@ -333,9 +425,11 @@
     if(!nearbyCollectible)return;
     const item=nearbyCollectible;collectedIds.add(String(item.id));
     try{localStorage.setItem(collectionStorageKey,JSON.stringify([...collectedIds]))}catch{}
+    savePlayerPosition();
     itemPrompt.hidden=true;nearbyCollectible=null;updateCollectionToggle();showWish(item);
   });
   collectionToggle.addEventListener('click',showCollection);
+  wishesToggle.addEventListener('click',showWishes);
   document.querySelector('#confirm-surprise').addEventListener('click',closeSurpriseModal);
   updateCollectionToggle();
   function rabbitPositionAt(homeX,homeY,step,seed){
@@ -446,7 +540,7 @@
   }
   function render(time=0){
     const dt=Math.min((time-lastTime)/16.67||1,2);lastTime=time;
-    let dx=0,dy=0;if(gameStarted&&surpriseModal.hidden){if(held.has('left'))dx--;if(held.has('right'))dx++;if(held.has('up'))dy--;if(held.has('down'))dy++}
+    let dx=0,dy=0;if(gameStarted&&!activeMission&&surpriseModal.hidden){if(held.has('left'))dx--;if(held.has('right'))dx++;if(held.has('up'))dy--;if(held.has('down'))dy++}
     let walked=false;
     if(dx||dy){const length=Math.hypot(dx,dy),stepX=dx/length*player.speed*dt,stepY=dy/length*player.speed*dt;
       if(canWalk(player.x,player.y,player.x+stepX,player.y)){player.x+=stepX;walked=true}
@@ -456,13 +550,13 @@
     player.x=Math.max(35,Math.min(world.w-35,player.x));player.y=Math.max(40,Math.min(world.h-20,player.y));
     if(!cameraDragged){camera.x=Math.max(0,Math.min(world.w-width/world.scale,player.x-width/(2*world.scale)));camera.y=Math.max(0,Math.min(world.h-height/world.scale,player.y-height/(2*world.scale)))}
     else{camera.x=Math.max(0,Math.min(world.w-width/world.scale,camera.x));camera.y=Math.max(0,Math.min(world.h-height/world.scale,camera.y))}
-    updateCollectiblePrompt();
+    updateMissionTriggers();updateCollectiblePrompt();
     ctx.clearRect(0,0,width,height);ctx.save();ctx.scale(world.scale,world.scale);ctx.translate(-camera.x,-camera.y);ctx.drawImage(worldArt,0,0);
-    missionCircles.forEach(marker=>drawMissionCircle(marker,time));trees.filter(t=>t.y<player.y&&treeClear(t.x,t.y)).forEach(drawTree);drawCollectibles(time);drawButterflies(time);drawRabbits(time);drawPlayer();
+    missionCircles.filter(marker=>!missionCircleComplete(marker.id)).forEach(marker=>drawMissionCircle(marker,time));trees.filter(t=>t.y<player.y&&treeClear(t.x,t.y)).forEach(drawTree);drawCollectibles(time);drawButterflies(time);drawRabbits(time);drawPlayer();
     trees.filter(t=>t.y>=player.y&&treeClear(t.x,t.y)).forEach(drawTree);ctx.restore();requestAnimationFrame(render)
   }
   const keyMap={ArrowUp:'up',ArrowDown:'down',ArrowLeft:'left',ArrowRight:'right',w:'up',s:'down',a:'left',d:'right',W:'up',S:'down',A:'left',D:'right'};
-  window.addEventListener('keydown',e=>{const dir=keyMap[e.key];if(dir){e.preventDefault();if(gameStarted&&surpriseModal.hidden){cameraDragged=false;held.add(dir)}}});window.addEventListener('keyup',e=>{const dir=keyMap[e.key];if(dir)held.delete(dir)});window.addEventListener('blur',()=>held.clear());
+  window.addEventListener('keydown',e=>{const dir=keyMap[e.key];if(dir){e.preventDefault();if(gameStarted&&!activeMission&&surpriseModal.hidden){cameraDragged=false;held.add(dir)}}});window.addEventListener('keyup',e=>{const dir=keyMap[e.key];if(dir)held.delete(dir)});window.addEventListener('blur',()=>held.clear());
   if(dragToPan){
     canvas.style.cursor='grab';
     canvas.addEventListener('pointerdown',e=>{e.preventDefault();activePan={id:e.pointerId,x:e.clientX,y:e.clientY,cameraX:camera.x,cameraY:camera.y};canvas.setPointerCapture(e.pointerId);canvas.style.cursor='grabbing'});
@@ -470,6 +564,6 @@
     const stopPan=e=>{if(activePan&&activePan.id===e.pointerId){activePan=null;canvas.style.cursor='grab'}};
     canvas.addEventListener('pointerup',stopPan);canvas.addEventListener('pointercancel',stopPan);canvas.addEventListener('lostpointercapture',stopPan);
   }
-  document.querySelectorAll('.move').forEach(btn=>{const dir=btn.dataset.dir;const release=()=>{held.delete(dir);btn.classList.remove('pressed')};btn.addEventListener('pointerdown',e=>{e.preventDefault();if(!gameStarted||!surpriseModal.hidden)return;cameraDragged=false;held.add(dir);btn.classList.add('pressed');btn.setPointerCapture(e.pointerId)});btn.addEventListener('pointerup',release);btn.addEventListener('pointercancel',release);btn.addEventListener('lostpointercapture',release);btn.addEventListener('contextmenu',e=>e.preventDefault())});
+  document.querySelectorAll('.move').forEach(btn=>{const dir=btn.dataset.dir;const release=()=>{held.delete(dir);btn.classList.remove('pressed')};btn.addEventListener('pointerdown',e=>{e.preventDefault();if(!gameStarted||activeMission||!surpriseModal.hidden)return;cameraDragged=false;held.add(dir);btn.classList.add('pressed');btn.setPointerCapture(e.pointerId)});btn.addEventListener('pointerup',release);btn.addEventListener('pointercancel',release);btn.addEventListener('lostpointercapture',release);btn.addEventListener('contextmenu',e=>e.preventDefault())});
   new ResizeObserver(resize).observe(viewport);resize();requestAnimationFrame(render);
 })();

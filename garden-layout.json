@@ -116,6 +116,19 @@
       "color": "#fc64fe"
     }
   ],
+  "missions": {
+    "task1": {
+      "name": "Piece by Piece",
+      "missionCircleId": 1,
+      "codeFile": "tasks/task1/task1.js",
+      "functionName": "startPieceByPieceTask",
+      "styleFile": "tasks/task1/task1.css",
+      "image": "tasks/task1/afrin.jpeg",
+      "gridSize": 3,
+      "emptyCell": 2,
+      "successMessage": "Piece by piece, we’ll build our life together—filled with little adventures, shared laughter, and a love that feels more like home every day. I can’t wait to make every piece of it with you."
+    }
+  },
   "houses": [
     {
       "id": 1,

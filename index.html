@@ -31,13 +31,19 @@
           <p class="welcome-footnote"><span aria-hidden="true">♡</span> Take your time and enjoy the little things</p>
         </section>
       </div>
+      <div id="mission-screen" class="mission-screen" hidden></div>
       <div id="item-prompt" class="item-prompt" hidden>
         <p><span class="prompt-emoji">✨</span> You found a <strong id="found-item-name"></strong>!<br />Would you like to collect?</p>
         <button id="collect-item" type="button">Collect</button>
       </div>
+      <div class="garden-shortcuts">
       <button id="collection-toggle" class="collection-toggle" type="button" hidden aria-label="Open your collection">
         <span aria-hidden="true">🎁</span> Collection <span id="collection-count" class="collection-count"></span>
       </button>
+      <button id="wishes-toggle" class="collection-toggle wishes-toggle" type="button" hidden aria-label="Open your wishes">
+        <span aria-hidden="true">&#x2661;</span> Wishes <span id="wishes-count" class="collection-count"></span>
+      </button>
+      </div>
       <div id="surprise-modal" class="surprise-modal" hidden>
         <section class="surprise-card" role="dialog" aria-modal="true" aria-label="Collected birthday wish">
           <div id="surprise-content"></div>

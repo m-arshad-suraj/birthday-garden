@@ -1,0 +1,18 @@
+.task1-shell{position:relative;display:flex;flex-direction:column;align-items:center;width:min(620px,100%);max-height:100%;overflow:auto;padding:clamp(14px,3vh,28px) clamp(13px,4vw,30px) 22px;border:1px solid #f2e3c8;border-radius:30px;background:radial-gradient(circle at 12% 18%,#fff0d7 0 5px,transparent 6px),radial-gradient(circle at 88% 24%,#f8dce5 0 5px,transparent 6px),linear-gradient(150deg,#fff9eb,#fffdf8 58%,#fff4f1);box-shadow:0 22px 70px #1d302d55,0 6px 0 #e8b9ae;color:#465c48;animation:task1-arrive .28s ease-out both}
+.task1-header{display:flex;align-items:center;width:100%;min-height:42px}
+.task1-back{justify-self:start;min-height:38px;padding:0 13px;border:1px solid #e3d7bf;border-radius:999px;background:#fffdf5;color:#596b4c;font:700 12px "DM Sans",Arial,sans-serif;box-shadow:0 2px 0 #eee2cd;cursor:pointer}.task1-back span{margin-right:5px;font-size:17px;vertical-align:-1px}
+.task1-content{position:relative;display:flex;flex-direction:column;align-items:center;width:100%;padding-top:clamp(8px,2vh,20px);text-align:center}
+.task1-flower{position:absolute;right:8%;top:7px;color:#d58a9a;font-size:24px;transform:rotate(14deg)}
+.task1-title{margin:0;color:#4f684b;font:700 clamp(28px,6vw,38px)/1.1 "Playfair Display",Georgia,serif;letter-spacing:-.035em}
+.task1-instruction{max-width:390px;margin:10px auto 16px;color:#74786b;font:500 13px/1.55 "DM Sans",Arial,sans-serif}
+.task1-puzzle-wrap{width:min(78vw,430px);padding:8px;border:1px solid #eadbc2;border-radius:20px;background:#fff9ed;box-shadow:0 8px 20px #6d67431a}
+.task1-puzzle{display:grid;grid-template-columns:repeat(var(--task1-size),1fr);gap:4px;width:100%;aspect-ratio:1;border-radius:13px;overflow:hidden;background:#f4e9d4;touch-action:manipulation}
+.task1-tile{min-width:0;min-height:0;padding:0;border:1px solid #fff8e8;border-radius:7px;background-repeat:no-repeat;box-shadow:inset 0 0 0 1px #5d514222,0 2px 4px #35422c20;cursor:pointer;touch-action:manipulation;transition:filter .12s,transform .12s}
+.task1-tile:hover{filter:brightness(1.06);transform:scale(.975)}.task1-tile:focus-visible{position:relative;z-index:1;outline:3px solid #d87491;outline-offset:-4px}
+.task1-empty{border:1px dashed #d9c8ae;border-radius:7px;background:repeating-linear-gradient(135deg,#f4e9d7,#f4e9d7 8px,#efe1cd 8px,#efe1cd 16px)}
+.task1-status{min-height:20px;margin:11px 0 0;color:#8a7967;font:600 11px/1.45 "DM Sans",Arial,sans-serif}
+.task1-nudge{animation:task1-nudge .18s ease-in-out}.task1-solved .task1-puzzle{box-shadow:0 0 0 3px #9ac68a,0 0 28px #9ac68a55}
+@keyframes task1-arrive{from{opacity:0;transform:translateY(9px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes task1-nudge{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+@media(max-width:520px){.task1-shell{width:100%;max-height:100%;padding:12px 11px 15px;border-radius:24px}.task1-puzzle-wrap{width:min(84vw,390px);padding:6px}.task1-puzzle{gap:3px}.task1-tile,.task1-empty{border-radius:5px}.task1-instruction{margin:8px auto 12px;font-size:12px}.task1-status{margin-top:8px}}
+@media(max-height:700px){.task1-shell{padding-top:10px;padding-bottom:12px}.task1-content{padding-top:5px}.task1-instruction{margin:7px auto 9px}.task1-puzzle-wrap{width:min(68vh,360px)}.task1-status{margin-top:7px}}
