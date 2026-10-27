@@ -5,6 +5,7 @@
   const viewport = document.querySelector('#viewport');
   const world = { w: 4200, h: 2800, scale: .9 };
   const player = { x: Number(layout.playerStart.x), y: Number(layout.playerStart.y), speed: 3.2, facing: 'right', step: 0 };
+  const missionCircles=(Array.isArray(layout.missionCircles)?layout.missionCircles:layout.missionCircle?[{id:1,...layout.missionCircle}]:[]).map((marker,index)=>({id:Number(marker.id)||index+1,x:Number(marker.x)||0,y:Number(marker.y)||0,radius:Math.max(24,Number(marker.radius)||92),color:marker.color||'#50e890'}));
   const camera = { x: 0, y: 0 };
   const dragToPan=layout.dragToPan===true;
   let cameraDragged=false,activePan=null;
@@ -417,6 +418,15 @@
     if(player.facing==='up')ellipse(x,y-32,1.6,1.6,'#f0d294');
     ctx.restore();
   }
+  function drawMissionCircle(marker,time){
+    const {x,y,radius:r}=marker,pulse=(Math.sin(time*.003+marker.id)+1)/2;
+    ctx.save();ctx.translate(x,y);
+    // GTA-like ground marker: a luminous disc, segmented ring, and floating mission tag.
+    ctx.globalAlpha=.12+pulse*.08;ctx.fillStyle=marker.color;ctx.beginPath();ctx.ellipse(0,0,r*.9,r*.48,0,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;
+    ctx.globalAlpha=.72+pulse*.25;ctx.strokeStyle=marker.color;ctx.lineWidth=5;ctx.setLineDash([18,10]);ctx.lineDashOffset=-time*.018;ctx.beginPath();ctx.ellipse(0,0,r,r*.55,0,0,Math.PI*2);ctx.stroke();ctx.setLineDash([]);
+    ctx.globalAlpha=.22+pulse*.18;ctx.strokeStyle=marker.color;ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(0,0,r*(.72+pulse*.08),r*(.4+pulse*.045),0,0,Math.PI*2);ctx.stroke();ctx.globalAlpha=1;
+    ctx.restore();
+  }
   function render(time=0){
     const dt=Math.min((time-lastTime)/16.67||1,2);lastTime=time;
     let dx=0,dy=0;if(surpriseModal.hidden){if(held.has('left'))dx--;if(held.has('right'))dx++;if(held.has('up'))dy--;if(held.has('down'))dy++}
@@ -431,7 +441,7 @@
     else{camera.x=Math.max(0,Math.min(world.w-width/world.scale,camera.x));camera.y=Math.max(0,Math.min(world.h-height/world.scale,camera.y))}
     updateCollectiblePrompt();
     ctx.clearRect(0,0,width,height);ctx.save();ctx.scale(world.scale,world.scale);ctx.translate(-camera.x,-camera.y);ctx.drawImage(worldArt,0,0);
-    trees.filter(t=>t.y<player.y&&treeClear(t.x,t.y)).forEach(drawTree);drawCollectibles(time);drawButterflies(time);drawRabbits(time);drawPlayer();
+    missionCircles.forEach(marker=>drawMissionCircle(marker,time));trees.filter(t=>t.y<player.y&&treeClear(t.x,t.y)).forEach(drawTree);drawCollectibles(time);drawButterflies(time);drawRabbits(time);drawPlayer();
     trees.filter(t=>t.y>=player.y&&treeClear(t.x,t.y)).forEach(drawTree);ctx.restore();requestAnimationFrame(render)
   }
   const keyMap={ArrowUp:'up',ArrowDown:'down',ArrowLeft:'left',ArrowRight:'right',w:'up',s:'down',a:'left',d:'right',W:'up',S:'down',A:'left',D:'right'};

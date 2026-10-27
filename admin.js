@@ -6,6 +6,7 @@
   const xInput=document.querySelector('#position-x'),yInput=document.querySelector('#position-y'),sizeInput=document.querySelector('#object-size');
   const butterflyCountInput=document.querySelector('#butterfly-count');
   const rabbitCountInput=document.querySelector('#rabbit-count');
+  const missionRadiusInput=document.querySelector('#mission-radius'),missionColorInput=document.querySelector('#mission-color');
   const productNameInput=document.querySelector('#collectible-name'),productEmojiInput=document.querySelector('#collectible-emoji'),productWishInput=document.querySelector('#collectible-wish');
   const productNameRow=document.querySelector('#collectible-name-row'),productEmojiRow=document.querySelector('#collectible-emoji-row'),productWishRow=document.querySelector('#collectible-wish-row');
   const positionXRow=document.querySelector('#position-x-row'),positionYRow=document.querySelector('#position-y-row');
@@ -24,6 +25,9 @@
   layout.rabbitCount=Math.max(0,Math.min(1000,Math.floor(Number(layout.rabbitCount??12))));
   rabbitCountInput.value=layout.rabbitCount;
   if(!Array.isArray(layout.collectibles))layout.collectibles=[];
+  layout.missionCircles=(Array.isArray(layout.missionCircles)?layout.missionCircles:layout.missionCircle?[{id:1,...layout.missionCircle}]:[]).map((marker,index)=>({id:Number(marker.id)||index+1,x:Number(marker.x)||0,y:Number(marker.y)||0,radius:Number(marker.radius)||92,color:marker.color||'#50e890'}));
+  const usedMissionIds=new Set();let nextMissionId=Math.max(0,...layout.missionCircles.map(marker=>marker.id))+1;
+  for(const marker of layout.missionCircles){if(usedMissionIds.has(marker.id)){while(usedMissionIds.has(nextMissionId))nextMissionId++;marker.id=nextMissionId++}usedMissionIds.add(marker.id)}
 
   const spine=[{x:0,y:1400},{x:950,y:1320},{x:1700,y:1480},{x:2550,y:1320},{x:3300,y:1480},{x:4200,y:1400}];
   const branches=[
@@ -73,6 +77,7 @@
     for(const bed of layout.flowerBeds||[])drawFlowerBed(bed);
     for(const tree of layout.trees)drawTree(tree);
     for(const item of layout.collectibles)drawCollectible(item);
+    layout.missionCircles.forEach(drawMissionCircle);
     drawStart(layout.playerStart);
   }
   function isSelected(type,id){return selected&&selected.type===type&&selected.id===id}
@@ -135,6 +140,11 @@
     ctx.fillStyle='#fff9e9';ctx.font='bold 11px system-ui,sans-serif';ctx.textAlign='left';ctx.textBaseline='middle';ctx.fillText('START',p.x+13,p.y);
     ctx.restore();
   }
+  function drawMissionCircle(marker){
+    const p=toScreen(marker.x,marker.y),r=Math.max(25,marker.radius*scale),is=isSelected('missionCircle',marker.id);
+    ctx.save();ctx.globalAlpha=.16;ctx.fillStyle=marker.color;ctx.beginPath();ctx.ellipse(p.x,p.y,r*.9,r*.48,0,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;ctx.strokeStyle=marker.color;ctx.lineWidth=is?4:3;ctx.setLineDash([Math.max(6,18*scale),Math.max(4,10*scale)]);ctx.beginPath();ctx.ellipse(p.x,p.y,r,r*.55,0,0,Math.PI*2);ctx.stroke();ctx.setLineDash([]);
+    ctx.restore();
+  }
   function resize(){
     const rect=canvas.getBoundingClientRect();width=rect.width;height=rect.height;dpr=Math.min(window.devicePixelRatio||1,2);
     canvas.width=Math.round(width*dpr);canvas.height=Math.round(height*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);
@@ -146,20 +156,24 @@
     if(selected.type==='tree')return layout.trees.find(t=>t.id===selected.id);
     if(selected.type==='flowerBed')return layout.flowerBeds.find(b=>b.id===selected.id);
     if(selected.type==='collectible')return layout.collectibles.find(item=>item.id===selected.id);
+    if(selected.type==='missionCircle')return layout.missionCircles.find(marker=>marker.id===selected.id);
     return layout.playerStart;
   }
   function showSelection(){
     const obj=selectedObject(),name=document.querySelector('#selected-name'),sizeRow=document.querySelector('#object-size-row');
     const isCollectible=selected?.type==='collectible';
+    const isMission=selected?.type==='missionCircle';
+    document.querySelector('#mission-radius-row').hidden=document.querySelector('#mission-color-row').hidden=!isMission;
     productNameRow.hidden=productEmojiRow.hidden=productWishRow.hidden=!isCollectible;
     deleteButton.disabled=!obj||selected.type==='start';
     if(!obj){selectionPrompt.hidden=false;inspectorHelp.hidden=false;name.hidden=true;positionXRow.hidden=positionYRow.hidden=true;xInput.value='';yInput.value='';xInput.disabled=yInput.disabled=sizeInput.disabled=true;sizeRow.hidden=true;productNameInput.value=productEmojiInput.value=productWishInput.value='';draw();return}
     selectionPrompt.hidden=true;inspectorHelp.hidden=true;name.hidden=false;positionXRow.hidden=positionYRow.hidden=false;
-    name.textContent=selected.type==='house'?'House selected':selected.type==='tree'?'Tree selected':selected.type==='flowerBed'?'Flower bed selected':isCollectible?'Collectible selected':'Player starting position';
+    name.textContent=selected.type==='house'?'House selected':selected.type==='tree'?'Tree selected':selected.type==='flowerBed'?'Flower bed selected':isCollectible?'Collectible selected':isMission?`Mission circle #${obj.id} selected`:'Player starting position';
     xInput.disabled=yInput.disabled=false;xInput.value=Math.round(obj.x);yInput.value=Math.round(obj.y);
     const hasSize=selected.type==='tree'||selected.type==='flowerBed';sizeRow.hidden=!hasSize;sizeInput.disabled=!hasSize;
     if(selected.type==='tree')sizeInput.value=obj.s;if(selected.type==='flowerBed')sizeInput.value=obj.scale;
     productNameInput.value=isCollectible?obj.name||'':'';productEmojiInput.value=isCollectible?obj.emoji||'🎁':'';productWishInput.value=isCollectible?obj.wish||'':'';
+    if(isMission){missionRadiusInput.value=obj.radius;missionColorInput.value=obj.color}
     draw();
   }
   function markChanged(){status.textContent='Unsaved layout changes';status.classList.add('changed')}
@@ -171,6 +185,8 @@
     const count=Math.max(0,Math.min(1000,Math.floor(Number(rabbitCountInput.value)||0)));
     layout.rabbitCount=count;markChanged();
   });
+  missionRadiusInput.addEventListener('input',()=>{const marker=selectedObject();if(selected?.type!=='missionCircle'||!marker)return;marker.radius=clamp(Number(missionRadiusInput.value)||92,24,500);draw();markChanged()});
+  missionColorInput.addEventListener('input',()=>{const marker=selectedObject();if(selected?.type!=='missionCircle'||!marker)return;marker.color=missionColorInput.value;draw();markChanged()});
   productNameInput.addEventListener('input',()=>{const item=selectedObject();if(selected?.type!=='collectible'||!item)return;item.name=productNameInput.value;markChanged()});
   productEmojiInput.addEventListener('input',()=>{const item=selectedObject();if(selected?.type!=='collectible'||!item)return;item.emoji=productEmojiInput.value||'🎁';draw();markChanged()});
   productWishInput.addEventListener('input',()=>{const item=selectedObject();if(selected?.type!=='collectible'||!item)return;item.wish=productWishInput.value;markChanged()});
@@ -179,6 +195,7 @@
   sizeInput.addEventListener('input',()=>{const obj=selectedObject();if(!obj||!['tree','flowerBed'].includes(selected?.type))return;const size=clamp(Number(sizeInput.value)||1,.5,2.5);if(selected.type==='tree')obj.s=size;else obj.scale=size;draw();markChanged()});
 
   function hitTest(sx,sy){
+    for(let i=layout.missionCircles.length-1;i>=0;i--){const m=layout.missionCircles[i],p=toScreen(m.x,m.y),r=Math.max(25,m.radius*scale);if(((sx-p.x)/r)**2+((sy-p.y)/(r*.65))**2<1.35)return{type:'missionCircle',id:m.id}}
     const start=toScreen(layout.playerStart.x,layout.playerStart.y);if(Math.hypot(start.x-sx,start.y-sy)<22)return{type:'start',id:'start'};
     for(let i=layout.collectibles.length-1;i>=0;i--){const item=layout.collectibles[i],p=toScreen(item.x,item.y);if(Math.hypot(p.x-sx,p.y-sy)<Math.max(19,24*scale))return{type:'collectible',id:item.id}}
     for(let i=layout.flowerBeds.length-1;i>=0;i--){const b=layout.flowerBeds[i],p=toScreen(b.x,b.y),rx=Math.max(22,170*scale*b.scale),ry=Math.max(14,82*scale*b.scale);if(((sx-p.x)/rx)**2+((sy-p.y)/ry)**2<1.25)return{type:'flowerBed',id:b.id}}
@@ -217,11 +234,17 @@
     const item={id,x:Math.round(world.w/2),y:Math.round(world.h/2),emoji:'🎁',name:'New surprise',wish:'Add a birthday wish here.'};
     layout.collectibles.push(item);selected={type:'collectible',id};showSelection();markChanged();productNameInput.focus();
   });
+  document.querySelector('#add-mission-circle').addEventListener('click',()=>{
+    const id=Math.max(0,...layout.missionCircles.map(marker=>Number(marker.id)||0))+1;
+    const marker={id,x:Math.round(world.w/2),y:Math.round(world.h/2),radius:92,color:'#50e890'};
+    layout.missionCircles.push(marker);selected={type:'missionCircle',id};showSelection();markChanged();
+  });
   deleteButton.addEventListener('click',()=>{
     if(!selected||selected.type==='start')return;
     if(selected.type==='house')layout.houses=layout.houses.filter(h=>h.id!==selected.id);
     else if(selected.type==='tree')layout.trees=layout.trees.filter(t=>t.id!==selected.id);
     else if(selected.type==='flowerBed')layout.flowerBeds=layout.flowerBeds.filter(b=>b.id!==selected.id);
+    else if(selected.type==='missionCircle')layout.missionCircles=layout.missionCircles.filter(m=>m.id!==selected.id);
     else layout.collectibles=layout.collectibles.filter(item=>item.id!==selected.id);
     selected=null;showSelection();markChanged();
   });

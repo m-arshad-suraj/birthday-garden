@@ -21,6 +21,7 @@
       <button id="add-house" type="button">＋ Add house</button>
       <button id="add-flower-bed" type="button">＋ Add flower bed</button>
       <button id="add-collectible" type="button">Add collectible</button>
+      <button id="add-mission-circle" type="button">+ Add mission circle</button>
       <label class="toolbar-setting">Butterflies <input id="butterfly-count" type="number" min="0" max="1000" step="1" /></label>
       <label class="toolbar-setting">Rabbits <input id="rabbit-count" type="number" min="0" max="1000" step="1" /></label>
       <button id="delete-object" class="danger" type="button" disabled>Delete selected</button>
@@ -39,9 +40,11 @@
         <label id="position-x-row" hidden>X position <input id="position-x" type="number" min="0" max="4200" step="10" disabled /></label>
         <label id="position-y-row" hidden>Y position <input id="position-y" type="number" min="0" max="2800" step="10" disabled /></label>
         <label id="object-size-row" hidden>Object size <input id="object-size" type="number" min="0.5" max="2.5" step="0.05" disabled /></label>
+        <label id="mission-radius-row" hidden>Mission radius <input id="mission-radius" type="number" min="24" max="500" step="5" /></label>
+        <label id="mission-color-row" hidden>Marker color <input id="mission-color" type="color" value="#50e890" /></label>
         <div id="inspector-help" class="help">
           <h3>How to use</h3>
-          <p>Drag a house, tree, flower bed, collectible, or pink player marker to its new place. Select a collectible to edit its icon, name, and wish.</p>
+          <p>Drag a house, tree, flower bed, collectible, mission circle, or pink player marker to its new place. Select a mission circle to edit its size or color.</p>
           <p>Set the butterfly and rabbit counts in the toolbar.</p>
           <p>The small labeled gate markers show each garden entrance on its branch road.</p>
           <p>Select an object and click <strong>Delete selected</strong> to remove it. Use the add buttons to create more.</p>
