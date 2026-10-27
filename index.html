@@ -16,6 +16,21 @@
     <div class="viewport" id="viewport">
       <canvas id="garden"
         aria-label="A garden you can explore. Use the arrow keys or direction buttons to walk."></canvas>
+      <div id="welcome-screen" class="welcome-screen" role="dialog" aria-modal="true" aria-labelledby="welcome-title">
+        <section class="welcome-card">
+          <span class="welcome-flower welcome-flower-one" aria-hidden="true">✿</span>
+          <span class="welcome-flower welcome-flower-two" aria-hidden="true">✿</span>
+          <p class="welcome-kicker">A LITTLE GARDEN FOR YOU</p>
+          <h1 id="welcome-title">Your garden is waiting</h1>
+          <p class="welcome-copy">Wander through a sunny little world, meet its lovely creatures, and discover the surprises tucked inside.</p>
+          <div class="welcome-actions">
+            <button id="welcome-explore" class="welcome-primary" type="button">Explore</button>
+            <button id="welcome-continue" class="welcome-primary" type="button" hidden>Continue</button>
+            <button id="welcome-restart" class="welcome-secondary" type="button" hidden>Explore from scratch</button>
+          </div>
+          <p class="welcome-footnote"><span aria-hidden="true">♡</span> Take your time and enjoy the little things</p>
+        </section>
+      </div>
       <div id="item-prompt" class="item-prompt" hidden>
         <p><span class="prompt-emoji">✨</span> You found a <strong id="found-item-name"></strong>!<br />Would you like to collect?</p>
         <button id="collect-item" type="button">Collect</button>

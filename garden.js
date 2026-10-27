@@ -15,6 +15,11 @@
   const collectionToggle=document.querySelector('#collection-toggle'),collectionCount=document.querySelector('#collection-count');
   const surpriseModal=document.querySelector('#surprise-modal'),surpriseContent=document.querySelector('#surprise-content');
   const collectionStorageKey='birthday-garden-collection-v1';
+  const welcomeStorageKey='birthday-garden-welcome-seen-v1';
+  const welcomeScreen=document.querySelector('#welcome-screen'),welcomeExplore=document.querySelector('#welcome-explore'),welcomeContinue=document.querySelector('#welcome-continue'),welcomeRestart=document.querySelector('#welcome-restart');
+  let gameStarted=false;
+  let hasVisited=false;try{hasVisited=localStorage.getItem(welcomeStorageKey)==='true'||localStorage.getItem(collectionStorageKey)!==null}catch{}
+  welcomeExplore.hidden=hasVisited;welcomeContinue.hidden=welcomeRestart.hidden=!hasVisited;
   let collectedIds=new Set(),nearbyCollectible=null;
   try{const saved=JSON.parse(localStorage.getItem(collectionStorageKey)||'[]');if(Array.isArray(saved))collectedIds=new Set(saved.map(String))}catch{}
   let width = 0, height = 0, dpr = 1, lastTime = 0, moved = false;
@@ -293,9 +298,21 @@
   }
   function updateCollectionToggle(){
     const count=collectibles.filter(item=>collectedIds.has(String(item.id))).length;
-    collectionToggle.hidden=count===0;collectionCount.textContent=`${count}/${collectibles.length}`;
+    collectionToggle.hidden=!gameStarted||count===0;collectionCount.textContent=`${count}/${collectibles.length}`;
   }
+  function beginGame(fromScratch=false){
+    if(fromScratch){
+      try{for(let i=localStorage.length-1;i>=0;i--){const key=localStorage.key(i);if(key!==welcomeStorageKey)localStorage.removeItem(key)}}catch{}
+      collectedIds.clear();
+    }
+    try{localStorage.setItem(welcomeStorageKey,'true')}catch{}
+    gameStarted=true;welcomeScreen.hidden=true;cameraDragged=false;updateCollectionToggle();updateCollectiblePrompt();
+  }
+  welcomeExplore.addEventListener('click',()=>beginGame());
+  welcomeContinue.addEventListener('click',()=>beginGame());
+  welcomeRestart.addEventListener('click',()=>beginGame(true));
   function updateCollectiblePrompt(){
+    if(!gameStarted){itemPrompt.hidden=true;return}
     if(!surpriseModal.hidden){itemPrompt.hidden=true;return}
     let closest=null,distance=86;
     for(const item of collectibles){
@@ -429,7 +446,7 @@
   }
   function render(time=0){
     const dt=Math.min((time-lastTime)/16.67||1,2);lastTime=time;
-    let dx=0,dy=0;if(surpriseModal.hidden){if(held.has('left'))dx--;if(held.has('right'))dx++;if(held.has('up'))dy--;if(held.has('down'))dy++}
+    let dx=0,dy=0;if(gameStarted&&surpriseModal.hidden){if(held.has('left'))dx--;if(held.has('right'))dx++;if(held.has('up'))dy--;if(held.has('down'))dy++}
     let walked=false;
     if(dx||dy){const length=Math.hypot(dx,dy),stepX=dx/length*player.speed*dt,stepY=dy/length*player.speed*dt;
       if(canWalk(player.x,player.y,player.x+stepX,player.y)){player.x+=stepX;walked=true}
@@ -445,7 +462,7 @@
     trees.filter(t=>t.y>=player.y&&treeClear(t.x,t.y)).forEach(drawTree);ctx.restore();requestAnimationFrame(render)
   }
   const keyMap={ArrowUp:'up',ArrowDown:'down',ArrowLeft:'left',ArrowRight:'right',w:'up',s:'down',a:'left',d:'right',W:'up',S:'down',A:'left',D:'right'};
-  window.addEventListener('keydown',e=>{const dir=keyMap[e.key];if(dir){e.preventDefault();if(surpriseModal.hidden){cameraDragged=false;held.add(dir)}}});window.addEventListener('keyup',e=>{const dir=keyMap[e.key];if(dir)held.delete(dir)});window.addEventListener('blur',()=>held.clear());
+  window.addEventListener('keydown',e=>{const dir=keyMap[e.key];if(dir){e.preventDefault();if(gameStarted&&surpriseModal.hidden){cameraDragged=false;held.add(dir)}}});window.addEventListener('keyup',e=>{const dir=keyMap[e.key];if(dir)held.delete(dir)});window.addEventListener('blur',()=>held.clear());
   if(dragToPan){
     canvas.style.cursor='grab';
     canvas.addEventListener('pointerdown',e=>{e.preventDefault();activePan={id:e.pointerId,x:e.clientX,y:e.clientY,cameraX:camera.x,cameraY:camera.y};canvas.setPointerCapture(e.pointerId);canvas.style.cursor='grabbing'});
@@ -453,6 +470,6 @@
     const stopPan=e=>{if(activePan&&activePan.id===e.pointerId){activePan=null;canvas.style.cursor='grab'}};
     canvas.addEventListener('pointerup',stopPan);canvas.addEventListener('pointercancel',stopPan);canvas.addEventListener('lostpointercapture',stopPan);
   }
-  document.querySelectorAll('.move').forEach(btn=>{const dir=btn.dataset.dir;const release=()=>{held.delete(dir);btn.classList.remove('pressed')};btn.addEventListener('pointerdown',e=>{e.preventDefault();if(!surpriseModal.hidden)return;cameraDragged=false;held.add(dir);btn.classList.add('pressed');btn.setPointerCapture(e.pointerId)});btn.addEventListener('pointerup',release);btn.addEventListener('pointercancel',release);btn.addEventListener('lostpointercapture',release);btn.addEventListener('contextmenu',e=>e.preventDefault())});
+  document.querySelectorAll('.move').forEach(btn=>{const dir=btn.dataset.dir;const release=()=>{held.delete(dir);btn.classList.remove('pressed')};btn.addEventListener('pointerdown',e=>{e.preventDefault();if(!gameStarted||!surpriseModal.hidden)return;cameraDragged=false;held.add(dir);btn.classList.add('pressed');btn.setPointerCapture(e.pointerId)});btn.addEventListener('pointerup',release);btn.addEventListener('pointercancel',release);btn.addEventListener('lostpointercapture',release);btn.addEventListener('contextmenu',e=>e.preventDefault())});
   new ResizeObserver(resize).observe(viewport);resize();requestAnimationFrame(render);
 })();
