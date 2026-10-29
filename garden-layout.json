@@ -1,5 +1,5 @@
 {
-  "dragToPan": true,
+  "dragToPan": false,
   "butterflyCount": 150,
   "rabbitCount": 10,
   "collectibles": [
@@ -82,41 +82,78 @@
     },
     {
       "id": 2,
-      "x": 4007,
-      "y": 366,
-      "radius": 92,
-      "color": "#fc64fe"
-    },
-    {
-      "id": 3,
-      "x": 230,
-      "y": 2607,
-      "radius": 92,
-      "color": "#fc64fe"
-    },
-    {
-      "id": 4,
-      "x": 2690,
-      "y": 2548,
-      "radius": 92,
-      "color": "#fc64fe"
-    },
-    {
-      "id": 5,
-      "x": 4021,
-      "y": 1815,
-      "radius": 92,
-      "color": "#fc64fe"
-    },
-    {
-      "id": 6,
       "x": 1309,
-      "y": 1154,
+      "y": 1181,
       "radius": 92,
       "color": "#fc64fe"
     }
   ],
   "missions": {
+    "task2": {
+      "name": "Two of Us 🫶",
+      "missionCircleId": 2,
+      "codeFile": "tasks/task2/task2.js",
+      "functionName": "startTwoOfUsTask",
+      "styleFile": "tasks/task2/task2.css",
+      "durationSeconds": 120,
+      "femaleName": "Afrin",
+      "maleName": "Arshad",
+      "goodSituations": [
+        {
+          "name": "Love",
+          "emoji": "🫶",
+          "weight": 20
+        },
+        {
+          "name": "Happiness",
+          "emoji": "😊",
+          "weight": 20
+        },
+        {
+          "name": "Career growth",
+          "emoji": "📈",
+          "weight": 10
+        },
+        {
+          "name": "Unity",
+          "emoji": "🤝",
+          "weight": 10
+        },
+        {
+          "name": "Financial independence",
+          "emoji": "💰",
+          "weight": 30
+        }
+      ],
+      "badSituations": [
+        {
+          "name": "Depression",
+          "emoji": "🌧️",
+          "weight": 20
+        },
+        {
+          "name": "Financial struggles",
+          "emoji": "💸",
+          "weight": 20
+        },
+        {
+          "name": "Family responsibilities",
+          "emoji": "🏡",
+          "weight": 10
+        },
+        {
+          "name": "Ego",
+          "emoji": "😕",
+          "weight": 10
+        },
+        {
+          "name": "Illness",
+          "emoji": "🤒",
+          "weight": 30
+        }
+      ],
+      "successMessage": "Life won't always be easy, my love❤️. We'll have happy moments and difficult days that call for understanding, compromise, and sacrifice 🤝💕. I want us to hold each other's hands through every storm, celebrate every little victory, and keep choosing each other 🫶🏻. The most beautiful thing in life isn't winning alone, but building a life where we both win together 🏡❤️✨."
+    },
     "task1": {
       "name": "Piece by Piece",
       "missionCircleId": 1,

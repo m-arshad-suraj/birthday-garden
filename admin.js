@@ -6,6 +6,7 @@
   const xInput=document.querySelector('#position-x'),yInput=document.querySelector('#position-y'),sizeInput=document.querySelector('#object-size');
   const butterflyCountInput=document.querySelector('#butterfly-count');
   const rabbitCountInput=document.querySelector('#rabbit-count');
+  const dragToPanInput=document.querySelector('#drag-to-pan');
   const missionRadiusInput=document.querySelector('#mission-radius'),missionColorInput=document.querySelector('#mission-color');
   const productNameInput=document.querySelector('#collectible-name'),productEmojiInput=document.querySelector('#collectible-emoji'),productWishInput=document.querySelector('#collectible-wish');
   const productNameRow=document.querySelector('#collectible-name-row'),productEmojiRow=document.querySelector('#collectible-emoji-row'),productWishRow=document.querySelector('#collectible-wish-row');
@@ -24,6 +25,7 @@
   butterflyCountInput.value=layout.butterflyCount;
   layout.rabbitCount=Math.max(0,Math.min(1000,Math.floor(Number(layout.rabbitCount??12))));
   rabbitCountInput.value=layout.rabbitCount;
+  layout.dragToPan=layout.dragToPan===true;dragToPanInput.checked=layout.dragToPan;
   if(!Array.isArray(layout.collectibles))layout.collectibles=[];
   layout.missionCircles=(Array.isArray(layout.missionCircles)?layout.missionCircles:layout.missionCircle?[{id:1,...layout.missionCircle}]:[]).map((marker,index)=>({id:Number(marker.id)||index+1,x:Number(marker.x)||0,y:Number(marker.y)||0,radius:Number(marker.radius)||92,color:marker.color||'#50e890'}));
   const usedMissionIds=new Set();let nextMissionId=Math.max(0,...layout.missionCircles.map(marker=>marker.id))+1;
@@ -185,6 +187,7 @@
     const count=Math.max(0,Math.min(1000,Math.floor(Number(rabbitCountInput.value)||0)));
     layout.rabbitCount=count;markChanged();
   });
+  dragToPanInput.addEventListener('change',()=>{layout.dragToPan=dragToPanInput.checked;markChanged()});
   missionRadiusInput.addEventListener('input',()=>{const marker=selectedObject();if(selected?.type!=='missionCircle'||!marker)return;marker.radius=clamp(Number(missionRadiusInput.value)||92,24,500);draw();markChanged()});
   missionColorInput.addEventListener('input',()=>{const marker=selectedObject();if(selected?.type!=='missionCircle'||!marker)return;marker.color=missionColorInput.value;draw();markChanged()});
   productNameInput.addEventListener('input',()=>{const item=selectedObject();if(selected?.type!=='collectible'||!item)return;item.name=productNameInput.value;markChanged()});

@@ -355,10 +355,10 @@
   function showMissionSuccess(mission,result){
     surpriseContent.replaceChildren();
     const emoji=document.createElement('span');emoji.className='wish-emoji';emoji.textContent='💞';
-    const kicker=document.createElement('p');kicker.className='wish-kicker';kicker.textContent='PIECE BY PIECE';
     const title=document.createElement('h2');title.className='wish-title';title.textContent=mission.name||result.taskName||'A life together';
     const message=document.createElement('p');message.className='wish-copy';message.textContent=result.message||mission.successMessage||'Piece by piece, we’ll build our life together. Every little moment with you is a piece I want to keep.';
-    surpriseContent.append(emoji,kicker,title,message);showSurpriseModal();
+    surpriseContent.append(emoji,title,message);
+    showSurpriseModal();
   }
   function showMissionLoading(mission){
     const panel=document.createElement('section');panel.className='mission-loading';
