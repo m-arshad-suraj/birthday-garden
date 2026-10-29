@@ -5,6 +5,7 @@
 .welcome-kicker{position:relative;margin:0 0 12px;color:#b77a72;font:800 10px "DM Sans",Arial,sans-serif;letter-spacing:.2em}
 .welcome-card h1{position:relative;margin:0;color:#4f684b;font:700 clamp(30px,7vw,40px)/1.08 "Playfair Display",Georgia,serif;letter-spacing:-.035em}
 .welcome-copy{position:relative;margin:16px auto 25px;max-width:330px;color:#74786b;font:500 14px/1.7 "DM Sans",Arial,sans-serif}
+.welcome-loading{position:relative;margin:0 auto 20px;color:#8a7967;font:600 12px "DM Sans",Arial,sans-serif}.welcome-loading:before{content:"";display:inline-block;width:10px;height:10px;margin-right:8px;border:2px solid #e9c7bf;border-top-color:#bb6d82;border-radius:50%;vertical-align:-2px;animation:welcome-spin .8s linear infinite}
 .welcome-flower{position:absolute;z-index:1;color:#d98799;text-shadow:0 2px 0 #f6d8dc;font-size:29px}.welcome-flower-one{top:17px;left:24px;transform:rotate(-18deg)}.welcome-flower-two{right:25px;bottom:51px;color:#d7ad5f;font-size:23px;transform:rotate(14deg)}
 .welcome-actions{position:relative;display:grid;gap:10px;max-width:290px;margin:auto}
 .welcome-actions button{min-height:50px;padding:0 20px;border-radius:999px;font:800 14px "DM Sans",Arial,sans-serif;cursor:pointer;transition:transform .12s,box-shadow .12s,background .12s}
@@ -15,6 +16,7 @@
 .welcome-actions button:active{transform:translateY(2px);box-shadow:0 2px 0 #a75e72}
 .welcome-footnote{position:relative;margin:22px 0 0;color:#9a8a78;font:500 10px "DM Sans",Arial,sans-serif;letter-spacing:.025em}.welcome-footnote span{margin-right:4px;color:#cb788c;font-size:15px;vertical-align:-1px}
 @keyframes welcome-pop{from{opacity:0;transform:translateY(12px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes welcome-spin{to{transform:rotate(360deg)}}
 .mission-screen{position:absolute;z-index:40;inset:0;display:grid;place-items:center;overflow:auto;padding:14px;background:radial-gradient(ellipse at 14% 15%,#fff2dbaa,transparent 36%),radial-gradient(ellipse at 86% 85%,#f4d8e2aa,transparent 38%),#344b3de8;backdrop-filter:blur(7px)}
 .garden-shortcuts{position:absolute;z-index:5;right:max(22px,env(safe-area-inset-right));bottom:calc(max(22px,env(safe-area-inset-bottom)) + 180px + 10px);display:flex;flex-direction:column;align-items:flex-end;gap:8px}
 .garden-shortcuts .collection-toggle{position:static;right:auto;bottom:auto}

@@ -23,10 +23,11 @@
   const surpriseModal=document.querySelector('#surprise-modal'),surpriseContent=document.querySelector('#surprise-content');
   const collectionStorageKey='birthday-garden-collection-v1';
   const welcomeStorageKey='birthday-garden-welcome-seen-v1';
-  const welcomeScreen=document.querySelector('#welcome-screen'),welcomeExplore=document.querySelector('#welcome-explore'),welcomeContinue=document.querySelector('#welcome-continue'),welcomeRestart=document.querySelector('#welcome-restart');
+  const welcomeScreen=document.querySelector('#welcome-screen'),welcomeLoading=document.querySelector('#welcome-loading'),welcomeExplore=document.querySelector('#welcome-explore'),welcomeContinue=document.querySelector('#welcome-continue'),welcomeRestart=document.querySelector('#welcome-restart');
   let gameStarted=false;
   let hasVisited=!!savedPlayerPosition;try{hasVisited=hasVisited||localStorage.getItem(welcomeStorageKey)==='true'||localStorage.getItem(collectionStorageKey)!==null}catch{}
   welcomeExplore.hidden=hasVisited;welcomeContinue.hidden=welcomeRestart.hidden=!hasVisited;
+  welcomeLoading.hidden=true;
   let collectedIds=new Set(),nearbyCollectible=null;
   try{const saved=JSON.parse(localStorage.getItem(collectionStorageKey)||'[]');if(Array.isArray(saved))collectedIds=new Set(saved.map(String))}catch{}
   function savePlayerPosition(){
