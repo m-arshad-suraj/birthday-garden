@@ -2,3 +2,4 @@
 .shot-title{margin:12px 0 2px;color:#4f684b;font:700 clamp(27px,5vw,36px)/1.1 "Playfair Display",Georgia,serif;letter-spacing:-.035em;text-align:center}
 .shot-lock{position:absolute;right:13px;top:13px;z-index:2;padding:7px 13px;border:1px solid #a85e70;border-radius:99px;background:#fffaf0ed;color:#9c5265;font:800 11px "DM Sans",Arial,sans-serif;box-shadow:0 2px 7px #3e513322;cursor:pointer}.shot-lock:disabled{border-color:#c4b99f;background:#f4efdf;color:#77816a;cursor:default}
 .shot-status{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}.shot-help{margin:5px 0 12px;color:#5e7354;text-align:center;font:700 12px/1.5 "DM Sans",Arial,sans-serif}
+.shot-shell{min-height:0}.shot-board{min-height:0}@media(max-width:600px){.shot-shell{overflow:hidden}.shot-board{flex:1 1 auto;min-height:min(220px,34vh)}}
