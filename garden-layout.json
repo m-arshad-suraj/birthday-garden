@@ -69,8 +69,8 @@
     }
   ],
   "playerStart": {
-    "x": 24,
-    "y": 1395
+    "x": 3804,
+    "y": 735
   },
   "missionCircles": [
     {
@@ -84,6 +84,13 @@
       "id": 2,
       "x": 1309,
       "y": 1181,
+      "radius": 92,
+      "color": "#fc64fe"
+    },
+    {
+      "id": 3,
+      "x": 4032,
+      "y": 384,
       "radius": 92,
       "color": "#fc64fe"
     }
@@ -153,6 +160,14 @@
         }
       ],
       "successMessage": "Life won't always be easy, my love❤️. We'll have happy moments and difficult days that call for understanding, compromise, and sacrifice 🤝💕. I want us to hold each other's hands through every storm, celebrate every little victory, and keep choosing each other 🫶🏻. The most beautiful thing in life isn't winning alone, but building a life where we both win together 🏡❤️✨."
+    },
+    "task3": {
+      "name": "A Heart Finds Its Way",
+      "missionCircleId": 3,
+      "codeFile": "tasks/task3/task3.js",
+      "functionName": "startHeartShotTask",
+      "styleFile": "tasks/task3/task3.css",
+      "successMessage": "❤️ You did it, my love! 🥹💕 Just like this little heart in this game, we might face obstacles, miss our goals, and take wrong turns in life. But every failure teaches us something and brings us closer to our dreams. Let's never give up, keep learning, and keep trying until we succeed. No matter how many obstacles life throws at us, let's face them together and build the beautiful life. One heart, two souls, and a thousand dreams to achieve together❤️🫂♾️"
     },
     "task1": {
       "name": "Piece by Piece",
