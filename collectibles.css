@@ -35,3 +35,7 @@
 .wish-emoji{font-size:68px;filter:drop-shadow(0 4px 0 #f2d9c7)}.wish-title{color:#8d5363;text-shadow:1px 2px 0 #f6e5cf}.wish-copy{color:#606b53}
 .modal-ok{display:block;min-width:120px;margin:24px auto 0;padding:11px 28px;border:2px solid #9e5c71;border-radius:999px;background:#d98598;color:#fffdf8;font:800 14px "DM Sans",Arial,sans-serif;box-shadow:0 5px 0 #a75e72,0 7px 12px #73524030;cursor:pointer;transition:transform .12s,box-shadow .12s}.modal-ok:hover{background:#cb7188;transform:translateY(-1px)}.modal-ok:active{transform:translateY(3px);box-shadow:0 2px 0 #a75e72}
 @media(max-width:600px){.surprise-card{border-radius:27px}.wish-emoji{font-size:58px}.modal-ok{margin-top:20px}}
+
+.birthday-ending-content{padding:8px 0 2px}.birthday-ending-content .wish-emoji{margin-bottom:10px}.birthday-ending-content .wish-kicker{color:#b25773}.birthday-ending-content .wish-title{max-width:420px;margin:0 auto 17px;font-size:clamp(27px,5.5vw,38px)}.birthday-ending-content .wish-copy{max-width:440px;font-size:clamp(15px,3.4vw,18px);line-height:1.75;color:#5f6752}
+.birthday-ending-active{z-index:100;background:linear-gradient(145deg,#fff3e4,#f8dfe5 55%,#f2e9d4);backdrop-filter:none}.birthday-ending-active .surprise-card{width:min(600px,100%);max-height:90vh}
+

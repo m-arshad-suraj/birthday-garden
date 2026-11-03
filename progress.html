@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#a9ca83" />
+  <title>Garden Progress Helper</title>
+  <link rel="stylesheet" href="progress.css" />
+</head>
+<body>
+  <main class="progress-page">
+    <header>
+      <p class="eyebrow">BIRTHDAY GARDEN</p>
+      <h1>Progress helper</h1>
+      <p>Mark collectibles and missions complete in this browser's saved garden.</p>
+    </header>
+    <nav class="actions" aria-label="Progress actions">
+      <button id="mark-all" class="primary" type="button">Mark everything complete</button>
+      <button id="clear-all" type="button">Clear progress</button>
+      <a href="index.html">Open garden</a>
+    </nav>
+    <p id="status" role="status" aria-live="polite">Loading garden…</p>
+    <section class="group" aria-labelledby="collectibles-title">
+      <h2 id="collectibles-title">Collectibles</h2>
+      <div id="collectibles-list" class="checklist"></div>
+    </section>
+    <section class="group" aria-labelledby="missions-title">
+      <h2 id="missions-title">Missions</h2>
+      <div id="missions-list" class="checklist"></div>
+    </section>
+    <p class="note">Changes are saved immediately. Refresh the garden page to see the updated progress and birthday ending.</p>
+  </main>
+  <script src="progress.js"></script>
+</body>
+</html>
