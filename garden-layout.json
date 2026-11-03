@@ -69,8 +69,8 @@
     }
   ],
   "playerStart": {
-    "x": 3804,
-    "y": 735
+    "x": 2401,
+    "y": 2115
   },
   "missionCircles": [
     {
@@ -89,10 +89,17 @@
     },
     {
       "id": 3,
-      "x": 4032,
-      "y": 384,
+      "x": 4018,
+      "y": 393,
       "radius": 92,
       "color": "#fc64fe"
+    },
+    {
+      "id": 4,
+      "x": 2701,
+      "y": 2566,
+      "radius": 92,
+      "color": "#76c7a0"
     }
   ],
   "missions": {
@@ -167,7 +174,95 @@
       "codeFile": "tasks/task3/task3.js",
       "functionName": "startHeartShotTask",
       "styleFile": "tasks/task3/task3.css",
+      "obstacles": [
+        {
+          "desktop": {
+            "x": 0.28,
+            "y": 0.68,
+            "r": 32
+          },
+          "mobile": {
+            "x": 0.82,
+            "y": 0.82,
+            "r": 23
+          }
+        },
+        {
+          "desktop": {
+            "x": 0.43,
+            "y": 0.43,
+            "r": 27
+          },
+          "mobile": {
+            "x": 0.2,
+            "y": 0.6,
+            "r": 22
+          }
+        },
+        {
+          "desktop": {
+            "x": 0.6,
+            "y": 0.62,
+            "r": 34
+          },
+          "mobile": {
+            "x": 0.44,
+            "y": 0.38,
+            "r": 24
+          }
+        },
+        {
+          "desktop": {
+            "x": 0.72,
+            "y": 0.34,
+            "r": 25
+          },
+          "mobile": {
+            "x": 0.55,
+            "y": 0.53,
+            "r": 21
+          }
+        },
+        {
+          "desktop": {
+            "x": 0.84,
+            "y": 0.64,
+            "r": 30
+          },
+          "mobile": {
+            "x": 0.82,
+            "y": 0.26,
+            "r": 23
+          }
+        },
+        {
+          "desktop": {
+            "x": 0.51,
+            "y": 0.84,
+            "r": 22
+          },
+          "mobile": {
+            "x": 0.46,
+            "y": 0.13,
+            "r": 19
+          }
+        }
+      ],
       "successMessage": "❤️ You did it, my love! 🥹💕 Just like this little heart in this game, we might face obstacles, miss our goals, and take wrong turns in life. But every failure teaches us something and brings us closer to our dreams. Let's never give up, keep learning, and keep trying until we succeed. No matter how many obstacles life throws at us, let's face them together and build the beautiful life. One heart, two souls, and a thousand dreams to achieve together❤️🫂♾️"
+    },
+    "task4": {
+      "name": "A Du’a for Us",
+      "missionCircleId": 4,
+      "codeFile": "tasks/task4/task4.js",
+      "functionName": "startDuaTask",
+      "styleFile": "tasks/task4/task4.css",
+      "duas": [
+        "Ya Allah, make our marriage a home filled with soft laughter, honest words, and the kind of love that brings us both closer to You.",
+        "When life feels heavy, let us be each other's comfort. Give us patient hearts, gentle words, and the courage to keep choosing one another.",
+        "Ya Allah, place barakah in the little life we're building together: in our home, our dreams, and every ordinary day we get to share.",
+        "Let us grow old side by side, still finding peace in each other's presence. Keep our hearts close in this life and reunite us in Jannah. Ameen."
+      ],
+      "successMessage": "May Allah accept every du'a, fill our lives with barakah, and keep our hearts close in goodness. Ameen."
     },
     "task1": {
       "name": "Piece by Piece",
