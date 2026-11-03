@@ -5,15 +5,47 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#a9ca83" />
-  <meta name="description" content="A little birthday garden to wander through." />
-  <title>Birthday Garden</title>
+  <meta name="description" content="A birthday garden made with love for Afrin." />
+  <title>For Afrin, with love | Birthday Garden</title>
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="collectibles.css" />
+  <link rel="stylesheet" href="birthday-gate.css" />
 </head>
 
 <body>
   <main class="full-garden" aria-label="Birthday garden">
-    <div class="viewport" id="viewport">
+    <section id="birthday-gate" class="birthday-gate" role="dialog" aria-modal="true" aria-labelledby="birthday-title"
+      aria-describedby="birthday-message">
+      <div class="birthday-stars" aria-hidden="true">
+        <span>✦</span><span>♡</span><span>✧</span><span>♡</span><span>✦</span>
+      </div>
+      <article class="birthday-card">
+        <span class="birthday-bloom" aria-hidden="true">✿</span>
+        <p class="birthday-kicker"><span aria-hidden="true">&#x2661;</span> A BIRTHDAY LOVE NOTE FROM ARSHAD <span
+            aria-hidden="true">&#x2661;</span></p>
+        <h1 id="birthday-title">Hi Afrin <span class="birthday-heart" aria-hidden="true">♥</span></h1>
+        <p class="birthday-dedication">To my beautiful wifey 🫶🏻 favourite doctor 🩺 and my forever love ❤️</p>
+        <p id="birthday-message" class="birthday-message">My love, I made a little world just for you. 🥹💕 Every
+          flower, hidden surprise, and corner of this garden has been designed with you in mind, holding a little piece
+          of my love. You spend your days caring for patients and making them smile. Today, let me do the same for you.
+          🌷 I hope exploring it brings a beautiful smile to your face, because your smile means the world to me. ❤️
+        </p>
+        <div class="birthday-flourish" aria-hidden="true"><span>✿</span><i></i><span>♥</span><i></i><span>✿</span></div>
+        <p class="birthday-countdown-label">Your birthday garden opens in</p>
+        <div class="birthday-countdown" aria-label="Time remaining until your birthday garden opens">
+          <div><strong id="birthday-days">––</strong><span>days</span></div>
+          <i aria-hidden="true">:</i>
+          <div><strong id="birthday-hours">––</strong><span>hours</span></div>
+          <i aria-hidden="true">:</i>
+          <div><strong id="birthday-minutes">––</strong><span>minutes</span></div>
+          <i aria-hidden="true">:</i>
+          <div><strong id="birthday-seconds">––</strong><span>seconds</span></div>
+        </div>
+        <p id="birthday-date-note" class="birthday-date-note" aria-live="polite">A little more time, and our garden will
+          be yours.</p>
+      </article>
+    </section>
+    <div class="viewport" id="viewport" inert>
       <canvas id="garden"
         aria-label="A garden you can explore. Use the arrow keys or direction buttons to walk."></canvas>
       <div id="welcome-screen" class="welcome-screen" role="dialog" aria-modal="true" aria-labelledby="welcome-title">
@@ -22,7 +54,8 @@
           <span class="welcome-flower welcome-flower-two" aria-hidden="true">✿</span>
           <p class="welcome-kicker">A LITTLE GARDEN FOR YOU</p>
           <h1 id="welcome-title">Your garden is waiting</h1>
-          <p class="welcome-copy">Wander through a sunny little world, meet its lovely creatures, and discover the surprises tucked inside.</p>
+          <p class="welcome-copy">Wander through a sunny little world, meet its lovely creatures, and discover the
+            surprises tucked inside.</p>
           <p id="welcome-loading" class="welcome-loading" role="status">Warming up your garden…</p>
           <div class="welcome-actions">
             <button id="welcome-explore" class="welcome-primary" type="button" hidden>Explore</button>
@@ -34,16 +67,18 @@
       </div>
       <div id="mission-screen" class="mission-screen" hidden></div>
       <div id="item-prompt" class="item-prompt" hidden>
-        <p><span class="prompt-emoji">✨</span> You found a <strong id="found-item-name"></strong>!<br />Would you like to collect?</p>
+        <p><span class="prompt-emoji">✨</span> You found a <strong id="found-item-name"></strong>!<br />Would you like
+          to collect?</p>
         <button id="collect-item" type="button">Collect</button>
       </div>
       <div class="garden-shortcuts">
-      <button id="collection-toggle" class="collection-toggle" type="button" hidden aria-label="Open your collection">
-        <span aria-hidden="true">🎁</span> Collection <span id="collection-count" class="collection-count"></span>
-      </button>
-      <button id="wishes-toggle" class="collection-toggle wishes-toggle" type="button" hidden aria-label="Open your wishes">
-        <span aria-hidden="true">&#x2661;</span> Wishes <span id="wishes-count" class="collection-count"></span>
-      </button>
+        <button id="collection-toggle" class="collection-toggle" type="button" hidden aria-label="Open your collection">
+          <span aria-hidden="true">🎁</span> Collection <span id="collection-count" class="collection-count"></span>
+        </button>
+        <button id="wishes-toggle" class="collection-toggle wishes-toggle" type="button" hidden
+          aria-label="Open your wishes">
+          <span aria-hidden="true">&#x2661;</span> Wishes <span id="wishes-count" class="collection-count"></span>
+        </button>
       </div>
       <div id="surprise-modal" class="surprise-modal" hidden>
         <section class="surprise-card" role="dialog" aria-modal="true" aria-label="Collected birthday wish">
@@ -59,6 +94,7 @@
       </div>
     </div>
   </main>
+  <script src="birthday-gate.js"></script>
   <script src="garden.js"></script>
 </body>
 

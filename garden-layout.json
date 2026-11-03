@@ -1,12 +1,14 @@
 {
+  "birthdayUnlockAt": "2026-11-03T13:00:00+05:30",
+  "birthdayTimeZone": "Asia/Colombo",
   "dragToPan": false,
   "butterflyCount": 150,
   "rabbitCount": 10,
   "collectibles": [
     {
       "id": 1,
-      "x": 1118,
-      "y": 384,
+      "x": 355,
+      "y": 1022,
       "emoji": "📱",
       "name": "Mobile Phone",
       "wish": "You're my favourite notification. ❤️"
@@ -69,8 +71,8 @@
     }
   ],
   "playerStart": {
-    "x": 2401,
-    "y": 2115
+    "x": 36,
+    "y": 1377
   },
   "missionCircles": [
     {
@@ -99,7 +101,7 @@
       "x": 2701,
       "y": 2566,
       "radius": 92,
-      "color": "#76c7a0"
+      "color": "#fc64fe"
     }
   ],
   "missions": {
