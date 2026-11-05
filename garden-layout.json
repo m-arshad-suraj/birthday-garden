@@ -1,6 +1,7 @@
 {
   "birthdayUnlockAt": "2026-11-03T13:00:00+05:30",
   "birthdayTimeZone": "Asia/Colombo",
+  "gardenMusicFile": "Happy-Birthday.mp3",
   "dragToPan": false,
   "butterflyCount": 150,
   "rabbitCount": 10,

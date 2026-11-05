@@ -25,6 +25,20 @@
   const welcomeStorageKey = 'birthday-garden-welcome-seen-v1';
   const birthdayEndingStorageKey = 'birthday-garden-ending-seen-v1';
   const welcomeScreen = document.querySelector('#welcome-screen'), welcomeLoading = document.querySelector('#welcome-loading'), welcomeExplore = document.querySelector('#welcome-explore'), welcomeContinue = document.querySelector('#welcome-continue'), welcomeRestart = document.querySelector('#welcome-restart');
+  const gardenMusicFile = String(layout.gardenMusicFile || '').trim();
+  const gardenMusic = gardenMusicFile ? new Audio(`./audio/${gardenMusicFile}`) : null;
+  if (gardenMusic) { gardenMusic.loop = true; gardenMusic.volume = 0.45 }
+  const musicToggle = document.querySelector('#music-toggle');
+  musicToggle.hidden = true;
+  musicToggle.addEventListener('click', async () => {
+    if (!gardenMusic) return;
+    if (gardenMusic.paused) {
+      try { await gardenMusic.play() } catch { return }
+    } else gardenMusic.pause();
+    const playing = !gardenMusic.paused;
+    musicToggle.innerHTML = `♫ <span>${playing ? 'Pause' : 'Play'}</span>`;
+    musicToggle.setAttribute('aria-label', `${playing ? 'Pause' : 'Play'} music`);
+  });
   let gameStarted = false;
   let hasVisited = !!savedPlayerPosition; try { hasVisited = hasVisited || localStorage.getItem(welcomeStorageKey) === 'true' || localStorage.getItem(collectionStorageKey) !== null } catch { }
   welcomeExplore.hidden = hasVisited; welcomeContinue.hidden = welcomeRestart.hidden = !hasVisited;
@@ -356,7 +370,7 @@
       player.x = Number(layout.playerStart.x); player.y = Number(layout.playerStart.y); savedPlayerPosition = null;
     }
     try { localStorage.setItem(welcomeStorageKey, 'true') } catch { }
-    gameStarted = true; welcomeScreen.hidden = true; cameraDragged = false; updateCollectionToggle(); updateCollectiblePrompt(); showBirthdayEnding();
+    gameStarted = true; welcomeScreen.hidden = true; cameraDragged = false; musicToggle.hidden = !gardenMusic; gardenMusic?.play().catch(() => {}); updateCollectionToggle(); updateCollectiblePrompt(); showBirthdayEnding();
   }
   welcomeExplore.addEventListener('click', () => beginGame());
   welcomeContinue.addEventListener('click', () => beginGame());
