@@ -17,7 +17,7 @@
   const dragToPan = layout.dragToPan === true;
   let cameraDragged = false, activePan = null;
   const held = new Set();
-  const collectibles = (layout.collectibles || []).map((item, index) => ({ id: Number(item.id) || index + 1, x: Number(item.x), y: Number(item.y), emoji: item.emoji || '🎁', name: item.name || 'Garden surprise', wish: item.wish || 'A little birthday wish, just for you.' }));
+  const collectibles = (layout.collectibles || []).map((item, index) => ({ id: Number(item.id) || index + 1, x: Number(item.x), y: Number(item.y), emoji: item.emoji || '🎁', name: item.name || 'Garden surprise', wish: item.wish || 'A little birthday wish, just for you.', requiredMissionKey: item.requiredMissionKey ? String(item.requiredMissionKey) : '' }));
   const itemPrompt = document.querySelector('#item-prompt'), foundItemName = document.querySelector('#found-item-name'), collectItemButton = document.querySelector('#collect-item');
   const collectionToggle = document.querySelector('#collection-toggle'), collectionCount = document.querySelector('#collection-count'), wishesToggle = document.querySelector('#wishes-toggle'), wishesCount = document.querySelector('#wishes-count');
   const surpriseModal = document.querySelector('#surprise-modal'), surpriseContent = document.querySelector('#surprise-content');
@@ -308,7 +308,7 @@
   }
   function drawCollectibles(time) {
     for (const item of collectibles) {
-      if (collectedIds.has(String(item.id))) continue;
+      if (collectedIds.has(String(item.id)) || (item.requiredMissionKey && !completedMissions.has(item.requiredMissionKey))) continue;
       const pulse = 1 + Math.sin(time * .004 + item.id) * .06;
       ellipse(item.x, item.y + 17, 18, 5, '#526e4d55');
       ctx.save(); ctx.translate(item.x, item.y + Math.sin(time * .003 + item.id) * 2); ctx.scale(pulse, pulse);
@@ -463,7 +463,7 @@
     if (!surpriseModal.hidden) { itemPrompt.hidden = true; return }
     let closest = null, distance = 86;
     for (const item of collectibles) {
-      if (collectedIds.has(String(item.id))) continue;
+      if (collectedIds.has(String(item.id)) || (item.requiredMissionKey && !completedMissions.has(item.requiredMissionKey))) continue;
       const d = Math.hypot(player.x - item.x, player.y - item.y);
       if (d < distance) { distance = d; closest = item }
     }

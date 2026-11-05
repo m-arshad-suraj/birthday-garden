@@ -72,8 +72,8 @@
     }
   ],
   "playerStart": {
-    "x": 36,
-    "y": 1377
+    "x": 4150,
+    "y": 632
   },
   "missionCircles": [
     {
@@ -92,8 +92,8 @@
     },
     {
       "id": 3,
-      "x": 4018,
-      "y": 393,
+      "x": 4027,
+      "y": 1844,
       "radius": 92,
       "color": "#fc64fe"
     },
@@ -101,6 +101,13 @@
       "id": 4,
       "x": 2701,
       "y": 2566,
+      "radius": 92,
+      "color": "#fc64fe"
+    },
+    {
+      "id": 5,
+      "x": 4018,
+      "y": 382,
       "radius": 92,
       "color": "#fc64fe"
     }
@@ -277,6 +284,14 @@
       "gridSize": 3,
       "emptyCell": 2,
       "successMessage": "Piece by piece, we’ll build our life together—filled with little adventures, shared laughter, and a love that feels more like home every day. I can’t wait to make every piece of it with you."
+    },
+    "task5": {
+      "name": "The Love Clinic",
+      "missionCircleId": 5,
+      "codeFile": "tasks/task5/task5.js",
+      "functionName": "startHeartClinicMission",
+      "styleFile": "tasks/task5/task5.css",
+      "successMessage": "Arshad has been discharged with a lifetime prescription for Afrin’s love. ❤️"
     }
   },
   "houses": [
