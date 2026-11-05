@@ -109,6 +109,7 @@
     { name: 'F', cx: 3500, cy: 2150, phase: 2.6, points: [{ x: 2800, y: 2800 }, ...bottomBranches[1].samples.slice().reverse(), ...spineSegment(4, 5).slice(1), { x: 4200, y: 2800 }, { x: 2800, y: 2800 }] }
   ];
   const houses = layout.houses.map((h, index) => ({ id: Number(h.id) || index + 1, x: Number(h.x), y: Number(h.y) }));
+  const signboards = (Array.isArray(layout.signboards) ? layout.signboards : []).map((sign, index) => ({ id: Number(sign.id) || index + 1, x: Number(sign.x) || 0, y: Number(sign.y) || 0, name: String(sign.name || 'Garden place') }));
   // Put one open village gate on a branch road beside each garden.
   const gateBranches = [[0], [0, 2], [2], [1], [1, 3], [3]];
   for (let i = 0; i < sections.length; i++) {
@@ -255,6 +256,22 @@
         ellipse(x + side * 87 - 3, y + 104, 3, 3, i % 2 ? '#f6c5ca' : '#f4d77e'); ellipse(x + side * 87 + 3, y + 106, 3, 3, '#fff1d5');
         ellipse(x + side * 76, y + 69, 5, 5, '#ffe7a0'); ellipse(x + side * 76, y + 69, 2, 2, '#fff8d5');
       }
+    }
+  }
+  function drawSignboards() {
+    for (const sign of signboards) {
+      const { x, y, name } = sign, width = Math.max(150, Math.min(260, name.length * 13 + 48)), height = 58;
+      ellipse(x, y + 66, width * .38, 13, '#526d4966');
+      ctx.fillStyle = '#60432f'; ctx.fillRect(x - width * .31, y + 17, 13, 61); ctx.fillRect(x + width * .31 - 13, y + 17, 13, 61);
+      ctx.fillStyle = '#9b6742'; ctx.fillRect(x - width * .31 + 3, y + 19, 4, 55); ctx.fillRect(x + width * .31 - 9, y + 19, 4, 55);
+      const wood = ctx.createLinearGradient(x, y - height / 2, x, y + height / 2); wood.addColorStop(0, '#b98151'); wood.addColorStop(.5, '#9c653e'); wood.addColorStop(1, '#7c4e35');
+      ctx.fillStyle = '#573b2e'; ctx.beginPath(); ctx.roundRect(x - width / 2 - 3, y - height / 2 - 3, width + 6, height + 6, 11); ctx.fill();
+      ctx.fillStyle = wood; ctx.beginPath(); ctx.roundRect(x - width / 2, y - height / 2, width, height, 9); ctx.fill();
+      ctx.strokeStyle = '#e0b476'; ctx.lineWidth = 2; ctx.beginPath(); ctx.roundRect(x - width / 2 + 6, y - height / 2 + 6, width - 12, height - 12, 6); ctx.stroke();
+      ctx.strokeStyle = '#68452f99'; ctx.lineWidth = 1.5;
+      for (let row = 0; row < 3; row++) { const gy = y - 15 + row * 15; ctx.beginPath(); ctx.moveTo(x - width / 2 + 13, gy); ctx.quadraticCurveTo(x - 15, gy + (row % 2 ? 2 : -2), x + width / 2 - 13, gy); ctx.stroke() }
+      ctx.fillStyle = '#f4ddb0'; ctx.beginPath(); ctx.arc(x - width / 2 + 14, y, 2.5, 0, Math.PI * 2); ctx.arc(x + width / 2 - 14, y, 2.5, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#fff0cf'; ctx.font = 'bold 19px Georgia,serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.shadowColor = '#4c3027'; ctx.shadowBlur = 2; ctx.fillText(name, x, y + 1, width - 34); ctx.shadowBlur = 0;
     }
   }
   function drawGround() {
@@ -521,7 +538,7 @@
   // Draw the detailed, unchanging garden once; only the character, butterflies, and rabbits animate.
   const screenCtx = ctx;
   const worldArt = document.createElement('canvas'); worldArt.width = world.w; worldArt.height = world.h;
-  ctx = worldArt.getContext('2d'); drawGround(); drawGardenGates(); drawFlowers(); drawHouses(); drawBench(); ctx = screenCtx;
+  ctx = worldArt.getContext('2d'); drawGround(); drawGardenGates(); drawFlowers(); drawHouses(); drawSignboards(); drawBench(); ctx = screenCtx;
   function drawPlayer() {
     const { x, y } = player;
     const side = player.facing === 'left' ? -1 : player.facing === 'right' ? 1 : 0;

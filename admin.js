@@ -10,6 +10,7 @@
   const missionRadiusInput=document.querySelector('#mission-radius'),missionColorInput=document.querySelector('#mission-color');
   const productNameInput=document.querySelector('#collectible-name'),productEmojiInput=document.querySelector('#collectible-emoji'),productWishInput=document.querySelector('#collectible-wish');
   const productNameRow=document.querySelector('#collectible-name-row'),productEmojiRow=document.querySelector('#collectible-emoji-row'),productWishRow=document.querySelector('#collectible-wish-row');
+  const signboardNameInput=document.querySelector('#signboard-name'),signboardNameRow=document.querySelector('#signboard-name-row');
   const positionXRow=document.querySelector('#position-x-row'),positionYRow=document.querySelector('#position-y-row');
   const selectionPrompt=document.querySelector('#selection-prompt'),inspectorHelp=document.querySelector('#inspector-help');
   const deleteButton=document.querySelector('#delete-object');
@@ -27,6 +28,7 @@
   rabbitCountInput.value=layout.rabbitCount;
   layout.dragToPan=layout.dragToPan===true;dragToPanInput.checked=layout.dragToPan;
   if(!Array.isArray(layout.collectibles))layout.collectibles=[];
+  layout.signboards=(Array.isArray(layout.signboards)?layout.signboards:[]).map((sign,index)=>({id:Number(sign.id)||index+1,x:Number(sign.x)||0,y:Number(sign.y)||0,name:String(sign.name||'Garden place')}));
   layout.missionCircles=(Array.isArray(layout.missionCircles)?layout.missionCircles:layout.missionCircle?[{id:1,...layout.missionCircle}]:[]).map((marker,index)=>({id:Number(marker.id)||index+1,x:Number(marker.x)||0,y:Number(marker.y)||0,radius:Number(marker.radius)||92,color:marker.color||'#50e890'}));
   const usedMissionIds=new Set();let nextMissionId=Math.max(0,...layout.missionCircles.map(marker=>marker.id))+1;
   for(const marker of layout.missionCircles){if(usedMissionIds.has(marker.id)){while(usedMissionIds.has(nextMissionId))nextMissionId++;marker.id=nextMissionId++}usedMissionIds.add(marker.id)}
@@ -76,6 +78,7 @@
     ctx.restore();
     gardenGates.forEach(drawGate);
     for(const house of layout.houses)drawHouse(house);
+    for(const sign of layout.signboards)drawSignboard(sign);
     for(const bed of layout.flowerBeds||[])drawFlowerBed(bed);
     for(const tree of layout.trees)drawTree(tree);
     for(const item of layout.collectibles)drawCollectible(item);
@@ -92,6 +95,16 @@
     ctx.fillStyle='#ae5548';ctx.beginPath();ctx.moveTo(-w*.46,-h*.12);ctx.lineTo(-w*.28,-h*.49);ctx.lineTo(w*.28,-h*.49);ctx.lineTo(w*.46,-h*.12);ctx.lineTo(0,h*.12);ctx.closePath();ctx.fill();
     ctx.fillStyle='#4c727b';ctx.beginPath();ctx.arc(0,-h*.14,Math.max(3,w*.1),0,Math.PI*2);ctx.fill();
     ctx.restore();
+  }
+  function drawSignboard(sign){
+    const p=toScreen(sign.x,sign.y),is=isSelected('signboard',sign.id),label=sign.name||'Garden place';
+    const w=Math.max(66,Math.min(170,label.length*7+30)*scale),h=Math.max(26,38*scale),post=Math.max(13,25*scale);
+    ctx.save();ctx.fillStyle='#526d4966';ctx.beginPath();ctx.ellipse(p.x,p.y+post*.6,w*.43,5,0,0,Math.PI*2);ctx.fill();
+    ctx.lineCap='round';ctx.strokeStyle='#573b2d';ctx.lineWidth=Math.max(5,8*scale);ctx.beginPath();ctx.moveTo(p.x-w*.3,p.y+h*.25);ctx.lineTo(p.x-w*.3,p.y+post);ctx.moveTo(p.x+w*.3,p.y+h*.25);ctx.lineTo(p.x+w*.3,p.y+post);ctx.stroke();
+    ctx.fillStyle=is?'#bd8252':'#9a633d';ctx.strokeStyle=is?'#fff0b8':'#68432f';ctx.lineWidth=is?3:2;ctx.beginPath();ctx.roundRect(p.x-w/2,p.y-h/2,w,h,6);ctx.fill();ctx.stroke();
+    ctx.strokeStyle='#d6a36a';ctx.lineWidth=1;ctx.beginPath();ctx.roundRect(p.x-w/2+4,p.y-h/2+4,w-8,h-8,4);ctx.stroke();
+    ctx.strokeStyle='#744a32aa';ctx.lineWidth=1;for(let i=0;i<3;i++){const gy=p.y-h*.25+i*h*.25;ctx.beginPath();ctx.moveTo(p.x-w*.39,gy);ctx.quadraticCurveTo(p.x-w*.1,gy+2,p.x+w*.38,gy);ctx.stroke()}
+    ctx.fillStyle='#fff0ce';ctx.font=`bold ${Math.max(9,12*scale)}px Georgia,serif`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(label,p.x,p.y,Math.max(40,w-17));ctx.restore();
   }
   function drawGate(gate){
     const p=toScreen(gate.x,gate.y);
@@ -158,6 +171,7 @@
     if(selected.type==='tree')return layout.trees.find(t=>t.id===selected.id);
     if(selected.type==='flowerBed')return layout.flowerBeds.find(b=>b.id===selected.id);
     if(selected.type==='collectible')return layout.collectibles.find(item=>item.id===selected.id);
+    if(selected.type==='signboard')return layout.signboards.find(sign=>sign.id===selected.id);
     if(selected.type==='missionCircle')return layout.missionCircles.find(marker=>marker.id===selected.id);
     return layout.playerStart;
   }
@@ -165,16 +179,19 @@
     const obj=selectedObject(),name=document.querySelector('#selected-name'),sizeRow=document.querySelector('#object-size-row');
     const isCollectible=selected?.type==='collectible';
     const isMission=selected?.type==='missionCircle';
+    const isSignboard=selected?.type==='signboard';
     document.querySelector('#mission-radius-row').hidden=document.querySelector('#mission-color-row').hidden=!isMission;
     productNameRow.hidden=productEmojiRow.hidden=productWishRow.hidden=!isCollectible;
+    signboardNameRow.hidden=!isSignboard;
     deleteButton.disabled=!obj||selected.type==='start';
     if(!obj){selectionPrompt.hidden=false;inspectorHelp.hidden=false;name.hidden=true;positionXRow.hidden=positionYRow.hidden=true;xInput.value='';yInput.value='';xInput.disabled=yInput.disabled=sizeInput.disabled=true;sizeRow.hidden=true;productNameInput.value=productEmojiInput.value=productWishInput.value='';draw();return}
     selectionPrompt.hidden=true;inspectorHelp.hidden=true;name.hidden=false;positionXRow.hidden=positionYRow.hidden=false;
-    name.textContent=selected.type==='house'?'House selected':selected.type==='tree'?'Tree selected':selected.type==='flowerBed'?'Flower bed selected':isCollectible?'Collectible selected':isMission?`Mission circle #${obj.id} selected`:'Player starting position';
+    name.textContent=selected.type==='house'?'House selected':selected.type==='signboard'?`${obj.name} signboard selected`:selected.type==='tree'?'Tree selected':selected.type==='flowerBed'?'Flower bed selected':isCollectible?'Collectible selected':isMission?`Mission circle #${obj.id} selected`:'Player starting position';
     xInput.disabled=yInput.disabled=false;xInput.value=Math.round(obj.x);yInput.value=Math.round(obj.y);
     const hasSize=selected.type==='tree'||selected.type==='flowerBed';sizeRow.hidden=!hasSize;sizeInput.disabled=!hasSize;
     if(selected.type==='tree')sizeInput.value=obj.s;if(selected.type==='flowerBed')sizeInput.value=obj.scale;
     productNameInput.value=isCollectible?obj.name||'':'';productEmojiInput.value=isCollectible?obj.emoji||'🎁':'';productWishInput.value=isCollectible?obj.wish||'':'';
+    signboardNameInput.value=isSignboard?obj.name||'':'';
     if(isMission){missionRadiusInput.value=obj.radius;missionColorInput.value=obj.color}
     draw();
   }
@@ -193,6 +210,7 @@
   productNameInput.addEventListener('input',()=>{const item=selectedObject();if(selected?.type!=='collectible'||!item)return;item.name=productNameInput.value;markChanged()});
   productEmojiInput.addEventListener('input',()=>{const item=selectedObject();if(selected?.type!=='collectible'||!item)return;item.emoji=productEmojiInput.value||'🎁';draw();markChanged()});
   productWishInput.addEventListener('input',()=>{const item=selectedObject();if(selected?.type!=='collectible'||!item)return;item.wish=productWishInput.value;markChanged()});
+  signboardNameInput.addEventListener('input',()=>{const sign=selectedObject();if(selected?.type!=='signboard'||!sign)return;sign.name=signboardNameInput.value;document.querySelector('#selected-name').textContent=`${sign.name||'Unnamed'} signboard selected`;draw();markChanged()});
   function setCoord(axis,value){const obj=selectedObject();if(!obj)return;obj[axis]=clamp(Number(value)||0,0,axis==='x'?world.w:world.h);draw();markChanged()}
   xInput.addEventListener('input',()=>setCoord('x',xInput.value));yInput.addEventListener('input',()=>setCoord('y',yInput.value));
   sizeInput.addEventListener('input',()=>{const obj=selectedObject();if(!obj||!['tree','flowerBed'].includes(selected?.type))return;const size=clamp(Number(sizeInput.value)||1,.5,2.5);if(selected.type==='tree')obj.s=size;else obj.scale=size;draw();markChanged()});
@@ -200,6 +218,7 @@
   function hitTest(sx,sy){
     for(let i=layout.missionCircles.length-1;i>=0;i--){const m=layout.missionCircles[i],p=toScreen(m.x,m.y),r=Math.max(25,m.radius*scale);if(((sx-p.x)/r)**2+((sy-p.y)/(r*.65))**2<1.35)return{type:'missionCircle',id:m.id}}
     const start=toScreen(layout.playerStart.x,layout.playerStart.y);if(Math.hypot(start.x-sx,start.y-sy)<22)return{type:'start',id:'start'};
+    for(let i=layout.signboards.length-1;i>=0;i--){const sign=layout.signboards[i],p=toScreen(sign.x,sign.y),w=Math.max(66,Math.min(170,(sign.name||'Garden place').length*7+30)*scale),h=Math.max(26,38*scale);if(Math.abs(p.x-sx)<w/2+5&&Math.abs(p.y-sy)<h/2+12)return{type:'signboard',id:sign.id}}
     for(let i=layout.collectibles.length-1;i>=0;i--){const item=layout.collectibles[i],p=toScreen(item.x,item.y);if(Math.hypot(p.x-sx,p.y-sy)<Math.max(19,24*scale))return{type:'collectible',id:item.id}}
     for(let i=layout.flowerBeds.length-1;i>=0;i--){const b=layout.flowerBeds[i],p=toScreen(b.x,b.y),rx=Math.max(22,170*scale*b.scale),ry=Math.max(14,82*scale*b.scale);if(((sx-p.x)/rx)**2+((sy-p.y)/ry)**2<1.25)return{type:'flowerBed',id:b.id}}
     for(let i=layout.houses.length-1;i>=0;i--){const h=layout.houses[i],p=toScreen(h.x,h.y);if(Math.abs(p.x-sx)<Math.max(28,74*scale)&&Math.abs(p.y-sy)<Math.max(24,62*scale))return{type:'house',id:h.id}}
@@ -227,6 +246,10 @@
     const id=Math.max(0,...layout.houses.map(h=>Number(h.id)||0))+1;
     const house={id,x:Math.round(world.w/2),y:Math.round(world.h/2)};layout.houses.push(house);selected={type:'house',id};showSelection();markChanged();
   });
+  document.querySelector('#add-signboard').addEventListener('click',()=>{
+    const id=Math.max(0,...layout.signboards.map(sign=>Number(sign.id)||0))+1;
+    const sign={id,x:Math.round(world.w/2),y:Math.round(world.h/2),name:'New place'};layout.signboards.push(sign);selected={type:'signboard',id};showSelection();markChanged();signboardNameInput.focus();signboardNameInput.select();
+  });
   document.querySelector('#add-flower-bed').addEventListener('click',()=>{
     if(!layout.flowerBeds)layout.flowerBeds=[];
     const id=Math.max(0,...layout.flowerBeds.map(b=>Number(b.id)||0))+1;
@@ -245,6 +268,7 @@
   deleteButton.addEventListener('click',()=>{
     if(!selected||selected.type==='start')return;
     if(selected.type==='house')layout.houses=layout.houses.filter(h=>h.id!==selected.id);
+    else if(selected.type==='signboard')layout.signboards=layout.signboards.filter(sign=>sign.id!==selected.id);
     else if(selected.type==='tree')layout.trees=layout.trees.filter(t=>t.id!==selected.id);
     else if(selected.type==='flowerBed')layout.flowerBeds=layout.flowerBeds.filter(b=>b.id!==selected.id);
     else if(selected.type==='missionCircle')layout.missionCircles=layout.missionCircles.filter(m=>m.id!==selected.id);
