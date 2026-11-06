@@ -1,24 +1,4 @@
 (function () {
-  const dialogue = [
-    { speaker: 'doctor', text: 'Hello, Arshad. What brings you here today?' },
-    { speaker: 'patient', text: "Doctor, I've been experiencing some unusual symptoms lately." },
-    { speaker: 'doctor', text: 'What kind of symptoms?' },
-    { speaker: 'patient', text: 'I experience sudden smiling episodes for no reason.', observation: 'Recurrent Romantic Euphoria' },
-    { speaker: 'doctor', text: 'How often does this happen?' },
-    { speaker: 'patient', text: 'Mostly whenever I think about someone special.' },
-    { speaker: 'doctor', text: 'Any other symptoms?' },
-    { speaker: 'patient', text: "I've developed a serious phone addiction.", observation: 'Afrin Notification Dependency' },
-    { speaker: 'doctor', text: 'Can you explain that?' },
-    { speaker: 'patient', text: "I keep checking my phone to see whether she's messaged me." },
-    { speaker: 'doctor', text: 'Anything else?' },
-    { speaker: 'patient', text: 'I think I have a hug deficiency.', observation: 'Acute Hug Deficiency Syndrome' },
-    { speaker: 'doctor', text: 'How severe is it?' },
-    { speaker: 'patient', text: 'Extremely severe! Only one particular person can treat it. 🥺' },
-    { speaker: 'doctor', text: 'Any other complaints?' },
-    { speaker: 'patient', text: 'I also have excessive affection towards that person.', observation: 'Chronic Romantic Attachment' },
-    { speaker: 'doctor', text: 'Who is this person?' },
-    { speaker: 'patient', text: 'Well... you know her, Doctor. ❤️' }
-  ];
   const medicines = [
     { id: 'cuddle', emoji: '💕', name: 'Cuddle Therapy', type: 'good', effect: 'love', scheduleConfig: { mode: 'duration', values: [2, 3, 5], unit: 'minutes', fixedMoment: 'Whenever needed', fixedPrompt: 'A cozy cuddle break, whenever it feels right' } },
     { id: 'forehead-kiss', emoji: '😘', name: 'Forehead Kisses', type: 'good', effect: 'kiss', scheduleConfig: { mode: 'kisses', values: [1, 2, 3], moments: [{ id: 'before-work', label: 'Before going to work' }, { id: 'after-work', label: 'After returning from work' }] } },
@@ -38,6 +18,8 @@
     'Finalizing diagnosis...'
   ];
   window.startHeartClinicMission = function (host, options = {}) {
+    const messageConfig = options.config?.messages || {};
+    const dialogue = messageConfig.consultation;
     const prescribed = new Set();
     const chatHistory = [];
     let dialogueIndex = 0, timer = 0, closed = false;
@@ -61,9 +43,9 @@
     }
     function appendChatMessage(messages, line) {
       const row = document.createElement('div'); row.className = `clinic-message-row ${line.speaker === 'doctor' ? 'from-doctor' : 'from-patient'}`;
-      const avatar = document.createElement('span'); avatar.className = `clinic-chat-avatar ${line.speaker === 'doctor' ? 'clinic-chat-avatar-doctor' : 'clinic-chat-avatar-patient'}`; avatar.setAttribute('aria-hidden', 'true'); avatar.textContent = line.speaker === 'doctor' ? '👩🏻‍⚕️' : '👨🏻';
+      const avatar = document.createElement('span'); avatar.className = `clinic-chat-avatar ${line.speaker === 'doctor' ? 'clinic-chat-avatar-doctor' : 'clinic-chat-avatar-patient'}`; avatar.setAttribute('aria-hidden', 'true'); avatar.textContent = messageConfig.avatars[line.speaker];
       const bubble = document.createElement('article'); bubble.className = 'clinic-message-bubble';
-      const who = document.createElement('strong'); who.textContent = line.speaker === 'doctor' ? 'Dr. Afrin' : 'Arshad';
+      const who = document.createElement('strong'); who.textContent = messageConfig.speakers[line.speaker];
       const words = document.createElement('p'); words.textContent = line.text;
       bubble.append(who, words);
       if (line.speaker === 'doctor') row.append(bubble, avatar); else row.append(avatar, bubble);
@@ -86,15 +68,19 @@
       frame('CONSULTATION · CARDIOLOGY', 'Arshad’s consultation');
       const scene = document.createElement('section'); scene.className = 'clinic-chat clinic-card';
       const contact = document.createElement('div'); contact.className = 'clinic-chat-contact';
-      contact.innerHTML = '<span class="clinic-chat-avatar clinic-chat-avatar-patient" aria-hidden="true">👨🏻</span><span class="clinic-chat-contact-copy"><b>Arshad Suraj</b><small><i></i> Patient · Cardiology</small></span><span class="clinic-chat-secure">♡ LOVE CLINIC</span>';
+      contact.innerHTML = `<span class="clinic-chat-avatar clinic-chat-avatar-patient" aria-hidden="true"></span><span class="clinic-chat-contact-copy"><b></b><small><i></i></small></span><span class="clinic-chat-secure"></span>`;
+      contact.querySelector('.clinic-chat-avatar').textContent = messageConfig.contact.avatar;
+      contact.querySelector('.clinic-chat-contact-copy b').textContent = messageConfig.contact.name;
+      contact.querySelector('.clinic-chat-contact-copy small').append(document.createTextNode(` ${messageConfig.contact.status}`));
+      contact.querySelector('.clinic-chat-secure').textContent = messageConfig.contact.secureLabel;
       const messages = document.createElement('div'); messages.className = 'clinic-chat-stack'; messages.setAttribute('role', 'log'); messages.setAttribute('aria-live', 'polite');
-      const next = action('Next →', advanceDialogue); next.className = 'clinic-action clinic-next';
+      const next = action(messageConfig.buttons.next, advanceDialogue); next.className = 'clinic-action clinic-next';
       scene.append(contact, messages, next); root.append(scene);
       function appendDialogue() {
         const line = dialogue[dialogueIndex++];
         chatHistory.push(line);
         appendChatMessage(messages, line);
-        next.textContent = dialogueIndex === dialogue.length ? 'Review medical notes →' : 'Next →';
+        next.textContent = dialogueIndex === dialogue.length ? messageConfig.buttons.review : messageConfig.buttons.next;
       }
       function advanceDialogue() {
         if (dialogueIndex < dialogue.length) appendDialogue();
@@ -162,23 +148,22 @@
       frame('TREATMENT PLAN · CHAT CONTINUES', 'A message from Dr. Afrin');
       const scene = document.createElement('section'); scene.className = 'clinic-chat clinic-card';
       const contact = document.createElement('div'); contact.className = 'clinic-chat-contact';
-      contact.innerHTML = '<span class="clinic-chat-avatar clinic-chat-avatar-patient" aria-hidden="true">👨🏻</span><span class="clinic-chat-contact-copy"><b>Arshad Suraj</b><small><i></i> Patient · Cardiology</small></span><span class="clinic-chat-secure">♡ LOVE CLINIC</span>';
+      contact.innerHTML = `<span class="clinic-chat-avatar clinic-chat-avatar-patient" aria-hidden="true"></span><span class="clinic-chat-contact-copy"><b></b><small><i></i></small></span><span class="clinic-chat-secure"></span>`;
+      contact.querySelector('.clinic-chat-avatar').textContent = messageConfig.contact.avatar;
+      contact.querySelector('.clinic-chat-contact-copy b').textContent = messageConfig.contact.name;
+      contact.querySelector('.clinic-chat-contact-copy small').append(document.createTextNode(` ${messageConfig.contact.status}`));
+      contact.querySelector('.clinic-chat-secure').textContent = messageConfig.contact.secureLabel;
       const messages = document.createElement('div'); messages.className = 'clinic-chat-stack'; messages.setAttribute('role', 'log'); messages.setAttribute('aria-live', 'polite');
       chatHistory.forEach(line => appendChatMessage(messages, line));
-      const treatmentMessages = [
-        'Hey, you are suffering from AFRINITIS MAXIMA.',
-        'Unfortunately, the prescribed medicines are not available at any pharmacy.',
-        'There’s only one place where you can get them...',
-        'Your wife! 🤭❤️'
-      ].map(text => ({ speaker: 'doctor', text }));
+      const treatmentMessages = messageConfig.treatment;
       let messageIndex = 0;
-      const next = action('Next →', advanceTreatmentChat); next.className = 'clinic-action clinic-next';
+      const next = action(messageConfig.buttons.next, advanceTreatmentChat); next.className = 'clinic-action clinic-next';
       scene.append(contact, messages, next); root.append(scene);
       messages.scrollTop = messages.scrollHeight;
       function advanceTreatmentChat() {
         if (messageIndex >= treatmentMessages.length) { showMedicines(); return }
         const line = treatmentMessages[messageIndex++]; chatHistory.push(line); appendChatMessage(messages, line);
-        next.textContent = messageIndex === treatmentMessages.length ? 'Open prescription →' : 'Next →';
+        next.textContent = messageIndex === treatmentMessages.length ? messageConfig.buttons.prescription : messageConfig.buttons.next;
       }
     }
     function showMedicines() {
@@ -315,8 +300,7 @@
       if (closed || prescribed.size < medicines.filter(medicine => medicine.type === 'good').length) return;
       closed = true;
       options.onComplete?.({
-        taskName: options.config?.name || 'The Love Clinic',
-        message: 'Hey, I missed telling you something. Actually, I don’t want to recover 🥺 Please keep prescribing your love, cuddles, kisses, and hand-holding for my whole life. 🫂💋🤝💖'
+        taskName: options.config?.name || 'The Love Clinic'
       });
     }
     showAdmission();

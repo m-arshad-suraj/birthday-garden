@@ -72,8 +72,8 @@
     }
   ],
   "playerStart": {
-    "x": 4150,
-    "y": 632
+    "x": 27,
+    "y": 1398
   },
   "missionCircles": [
     {
@@ -291,7 +291,128 @@
       "codeFile": "tasks/task5/task5.js",
       "functionName": "startHeartClinicMission",
       "styleFile": "tasks/task5/task5.css",
-      "successMessage": "Arshad has been discharged with a lifetime prescription for Afrin’s love. ❤️"
+      "messages": {
+        "speakers": {
+          "doctor": "Dr. Afrin",
+          "patient": "Arshad"
+        },
+        "avatars": {
+          "doctor": "👩🏻‍⚕️",
+          "patient": "👨🏻"
+        },
+        "contact": {
+          "avatar": "👨🏻",
+          "name": "Arshad Suraj",
+          "status": "Patient · Cardiology",
+          "secureLabel": "♡ LOVE CLINIC"
+        },
+        "buttons": {
+          "next": "Next →",
+          "review": "Review medical notes →",
+          "prescription": "Open prescription →"
+        },
+        "consultation": [
+          {
+            "speaker": "doctor",
+            "text": "Hello, Arshad. What brings you here today?"
+          },
+          {
+            "speaker": "patient",
+            "text": "Doctor, I think something unusual is happening to me lately."
+          },
+          {
+            "speaker": "doctor",
+            "text": "Alright. Tell me what's going on."
+          },
+          {
+            "speaker": "patient",
+            "text": "I keep smiling for absolutely no reason.",
+            "observation": "Recurrent Romantic Euphoria"
+          },
+          {
+            "speaker": "doctor",
+            "text": "No reason at all?"
+          },
+          {
+            "speaker": "patient",
+            "text": "Well... sometimes I just think about someone, and suddenly I can't stop smiling. ❤️"
+          },
+          {
+            "speaker": "doctor",
+            "text": "Interesting. Anything else?"
+          },
+          {
+            "speaker": "patient",
+            "text": "I've also noticed that I keep checking my phone every few minutes, Even when I know I've checked a minute ago. 🤭❤️",
+            "observation": "Afrin Notification Dependency"
+          },
+          {
+            "speaker": "doctor",
+            "text": "Oh! What are you checking? Social media or something?"
+          },
+          {
+            "speaker": "patient",
+            "text": "Not really. I'm just checking if I've got any new notifications from someone special. ❤️"
+          },
+          {
+            "speaker": "patient",
+            "text": "Even when I get a notification from someone else, I get all excited thinking it might be from her. But when I check and realize it's not her, I feel a little disappointed. 🥹😂❤️"
+          },
+          {
+            "speaker": "doctor",
+            "text": "I see. And how's your sleep?"
+          },
+          {
+            "speaker": "patient",
+            "text": "It's fine, Doctor. But I think I'm suffering from a serious lack of hugs.",
+            "observation": "Acute Hug Deficiency Syndrome"
+          },
+          {
+            "speaker": "doctor",
+            "text": "A lack of hugs? How do you usually treat that?"
+          },
+          {
+            "speaker": "patient",
+            "text": "That's the problem. Ordinary hugs won't work. I need one from a very particular person. 🥺"
+          },
+          {
+            "speaker": "doctor",
+            "text": "Hmm... This sounds like a case of excessive affection. Is there anything else?"
+          },
+          {
+            "speaker": "patient",
+            "text": "Yes, Doctor. I think I'm falling more in love every single day.",
+            "observation": "Chronic Romantic Attachment"
+          },
+          {
+            "speaker": "doctor",
+            "text": "And who is the person responsible for all these symptoms?"
+          },
+          {
+            "speaker": "patient",
+            "text": "Well... you know her quite well, Doctor. ❤️"
+          }
+        ],
+        "treatment": [
+          {
+            "speaker": "doctor",
+            "text": "Hey, you are suffering from AFRINITIS MAXIMA."
+          },
+          {
+            "speaker": "doctor",
+            "text": "Unfortunately, the prescribed medicines are not available at any pharmacy."
+          },
+          {
+            "speaker": "doctor",
+            "text": "There’s only one place where you can get them..."
+          },
+          {
+            "speaker": "doctor",
+            "text": "Your wife! 🤭❤️"
+          }
+        ]
+      },
+      "successMessage": "Hey, I missed telling you something. Actually, I don’t want to recover 🥺 Please keep prescribing your love, cuddles, kisses, and hand-holding for my whole life. 🫂💋🤝💖"
     }
   },
   "houses": [
