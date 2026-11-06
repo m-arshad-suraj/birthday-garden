@@ -44,6 +44,7 @@
   welcomeExplore.hidden = hasVisited; welcomeContinue.hidden = welcomeRestart.hidden = !hasVisited;
   welcomeLoading.hidden = true;
   let collectedIds = new Set(), nearbyCollectible = null;
+  let pendingGoalCompletion = null;
   try { const saved = JSON.parse(localStorage.getItem(collectionStorageKey) || '[]'); if (Array.isArray(saved)) collectedIds = new Set(saved.map(String)) } catch { }
   let birthdayEndingSeen = false; try { birthdayEndingSeen = localStorage.getItem(birthdayEndingStorageKey) === 'true' } catch { }
   function savePlayerPosition() {
@@ -383,6 +384,7 @@
     if (fromScratch) {
       try { for (let i = localStorage.length - 1; i >= 0; i--) { const key = localStorage.key(i); if (key !== welcomeStorageKey) localStorage.removeItem(key) } } catch { }
       collectedIds.clear(); completedMissions.clear(); missionInsideIds.clear();
+      pendingGoalCompletion = null;
       birthdayEndingSeen = false;
       player.x = Number(layout.playerStart.x); player.y = Number(layout.playerStart.y); savedPlayerPosition = null;
     }
@@ -428,8 +430,8 @@
       const startTask = window[mission.functionName]; if (typeof startTask !== 'function') throw new Error(`Mission function not found: ${mission.functionName}`);
       await startTask(missionScreen, {
         config: mission, onBack: leaveMission, onComplete: result => {
-          completedMissions.set(String(taskKey), { key: String(taskKey), name: mission.name || result?.taskName || String(taskKey), wish: result?.message || mission.successMessage || '' }); try { localStorage.setItem(missionStorageKey, JSON.stringify([...completedMissions.values()])) } catch { } savePlayerPosition();
-          leaveMission(); if (!showBirthdayEnding()) showMissionSuccess(mission, result || {});
+          pendingGoalCompletion = { type: 'mission', key: String(taskKey), record: { key: String(taskKey), name: mission.name || result?.taskName || String(taskKey), wish: result?.message || mission.successMessage || '' } };
+          leaveMission(); showMissionSuccess(mission, result || {});
         }
       });
     } catch (error) {
@@ -478,17 +480,28 @@
   }
   collectItemButton.addEventListener('click', () => {
     if (!nearbyCollectible) return;
-    const item = nearbyCollectible; collectedIds.add(String(item.id));
-    try { localStorage.setItem(collectionStorageKey, JSON.stringify([...collectedIds])) } catch { }
-    savePlayerPosition();
-    itemPrompt.hidden = true; nearbyCollectible = null; updateCollectionToggle(); if (!showBirthdayEnding()) showWish(item);
+    const item = nearbyCollectible;
+    pendingGoalCompletion = { type: 'collectible', id: String(item.id) };
+    itemPrompt.hidden = true; nearbyCollectible = null; showWish(item);
   });
   collectionToggle.addEventListener('click', showCollection);
   wishesToggle.addEventListener('click', showWishes);
   document.querySelector('#confirm-surprise').addEventListener('click', () => {
     const isBirthdayEnding = surpriseContent.classList.contains('birthday-ending-content');
     closeSurpriseModal(); surpriseModal.classList.remove('birthday-ending-active'); document.querySelector('#confirm-surprise').textContent = 'OK'; surpriseContent.classList.remove('birthday-ending-content');
-    if (isBirthdayEnding) beginGame(true);
+    if (isBirthdayEnding) { beginGame(true); return }
+    if (pendingGoalCompletion) {
+      if (pendingGoalCompletion.type === 'mission') {
+        completedMissions.set(pendingGoalCompletion.key, pendingGoalCompletion.record);
+        try { localStorage.setItem(missionStorageKey, JSON.stringify([...completedMissions.values()])) } catch { }
+      } else if (pendingGoalCompletion.type === 'collectible') {
+        collectedIds.add(pendingGoalCompletion.id);
+        try { localStorage.setItem(collectionStorageKey, JSON.stringify([...collectedIds])) } catch { }
+      }
+      pendingGoalCompletion = null;
+      savePlayerPosition(); updateCollectionToggle();
+      if (!showBirthdayEnding()) updateCollectiblePrompt();
+    }
   });
   if (allGardenGoalsComplete()) {
     gameStarted = true; welcomeScreen.hidden = true; showBirthdayEnding();
