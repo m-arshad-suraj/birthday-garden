@@ -1,14 +1,10 @@
 (function () {
   const medicines = [
-    { id: 'cuddle', emoji: '💕', name: 'Cuddle Therapy', type: 'good', effect: 'love', scheduleConfig: { mode: 'duration', values: [2, 3, 5], unit: 'minutes', fixedMoment: 'Whenever needed', fixedPrompt: 'A cozy cuddle break, whenever it feels right' } },
-    { id: 'forehead-kiss', emoji: '😘', name: 'Forehead Kisses', type: 'good', effect: 'kiss', scheduleConfig: { mode: 'kisses', values: [1, 2, 3], moments: [{ id: 'before-work', label: 'Before going to work' }, { id: 'after-work', label: 'After returning from work' }] } },
-    { id: 'cheek-kiss', emoji: '💋', name: 'Cheek Kisses', type: 'good', effect: 'kiss', scheduleConfig: { mode: 'kisses', values: [1, 2, 3], moments: [{ id: 'wake', label: 'After waking up' }, { id: 'before-sleep', label: 'Before going to sleep' }] } },
-    { id: 'hand-holding', emoji: '🤝', name: 'Hand Holding', type: 'good', effect: 'hug', scheduleConfig: { mode: 'fixed', fixedMoment: 'Whenever needed', fixedPrompt: 'A hand to hold whenever you need one' } },
-    { id: 'unconditional-love', emoji: '💖', name: 'Unconditional Love', type: 'good', effect: 'love', scheduleConfig: { mode: 'fixed', fixedMoment: 'Always', fixedPrompt: 'A forever promise, for every kind of day' } },
-    { id: 'hiding-feelings', emoji: '🤐', name: 'Hiding Feelings', type: 'naughty' },
-    { id: 'scolding', emoji: '😤', name: 'Scolding', type: 'naughty' },
-    { id: 'not-talking', emoji: '🙊', name: 'Not Talking', type: 'naughty' },
-    { id: 'angry-face', emoji: '😠', name: 'Angry Face', type: 'naughty' }
+    { id: 'cuddle', emoji: '💕', name: 'Cuddle Therapy', effect: 'love', scheduleConfig: { mode: 'duration', values: [2, 3, 5], unit: 'minutes', fixedMoment: 'Whenever needed', fixedPrompt: 'A cozy cuddle break, whenever it feels right' } },
+    { id: 'forehead-kiss', emoji: '😘', name: 'Forehead Kisses', effect: 'kiss', scheduleConfig: { mode: 'kisses', values: [1, 2, 3], moments: [{ id: 'before-work', label: 'Before going to work' }, { id: 'after-work', label: 'After returning from work' }] } },
+    { id: 'cheek-kiss', emoji: '💋', name: 'Cheek Kisses', effect: 'kiss', scheduleConfig: { mode: 'kisses', values: [1, 2, 3], moments: [{ id: 'wake', label: 'After waking up' }, { id: 'before-sleep', label: 'Before going to sleep' }] } },
+    { id: 'hand-holding', emoji: '🤝', name: 'Hand Holding', effect: 'hug', scheduleConfig: { mode: 'fixed', fixedMoment: 'Whenever needed', fixedPrompt: 'A hand to hold whenever you need one' } },
+    { id: 'unconditional-love', emoji: '💖', name: 'Unconditional Love', effect: 'love', scheduleConfig: { mode: 'fixed', fixedMoment: 'Always', fixedPrompt: 'A forever promise, for every kind of day' } },
   ];
   const diagnosticSteps = [
     'Analyzing heartbeat...',
@@ -168,13 +164,13 @@
     }
     function showMedicines() {
       frame('PRESCRIPTION', 'Choose Arshad’s treatment');
-      const goodMedicineCount = medicines.filter(medicine => medicine.type === 'good').length;
+      const medicineCount = medicines.length;
       const intro = document.createElement('p'); intro.className = 'clinic-medicine-intro'; intro.textContent = 'Prescribe some medicine for Arshad.'; root.append(intro);
       const grid = document.createElement('div'); grid.className = 'clinic-medicine-grid';
       const summary = document.createElement('section'); summary.className = 'clinic-summary clinic-card';
       const summaryTitle = document.createElement('h2'); summaryTitle.textContent = 'Prescription summary'; const list = document.createElement('ul'); list.className = 'clinic-prescribed-list';
       const feedback = document.createElement('p'); feedback.className = 'clinic-feedback'; feedback.setAttribute('aria-live', 'polite');
-      const next = action('Continue', showTreatmentSuccess); next.disabled = prescribed.size < goodMedicineCount;
+      const next = action('Continue', showTreatmentSuccess); next.disabled = prescribed.size < medicineCount;
       summary.append(summaryTitle, list, feedback, next); root.append(grid, summary);
       function updateSummary() {
         list.replaceChildren();
@@ -184,8 +180,8 @@
           item.lastChild.textContent = medicine.scheduleText || '';
           list.append(item);
         });
-        next.disabled = prescribed.size < goodMedicineCount;
-        if (prescribed.size === goodMedicineCount) feedback.textContent = 'All his love-filled treatments are prescribed and ready! 💊';
+        next.disabled = prescribed.size < medicineCount;
+        if (prescribed.size === medicineCount) feedback.textContent = 'All his love-filled treatments are prescribed and ready! 💊';
       }
       function openSchedule(medicine, card, state) {
         const overlay = document.createElement('div'); overlay.className = 'clinic-prescription-modal';
@@ -265,27 +261,14 @@
         }
         root.append(overlay); (fixedConsent && !fixedConsent.checked ? fixedConsent : save).focus();
       }
-      let dodgeCount = 0;
       medicines.forEach(medicine => {
-        const card = document.createElement('button'); card.type = 'button'; card.className = `clinic-medicine${medicine.type === 'naughty' ? ' is-naughty' : ''}`;
+        const card = document.createElement('button'); card.type = 'button'; card.className = 'clinic-medicine';
         const bottle = document.createElement('span'); bottle.className = 'clinic-bottle'; bottle.textContent = medicine.emoji;
         const name = document.createElement('strong'); name.textContent = medicine.name;
-        const dose = document.createElement('small'); dose.textContent = medicine.type === 'good' ? 'Choose schedule' : ''; dose.hidden = medicine.type === 'naughty';
+        const dose = document.createElement('small'); dose.textContent = 'Choose schedule';
         const state = document.createElement('span'); state.className = 'clinic-medicine-state';
         card.append(bottle, name, dose, state);
-        if (medicine.type === 'good') {
-          card.addEventListener('click', () => openSchedule(medicine, card, state));
-        } else {
-          const dodge = () => {
-            const siblings = [...grid.children], currentIndex = siblings.indexOf(card), targetIndex = (currentIndex + 2 + (dodgeCount++ % 2)) % siblings.length, target = siblings[targetIndex];
-            const before = card.getBoundingClientRect();
-            if (target && target !== card) grid.insertBefore(card, target);
-            const after = card.getBoundingClientRect(), dx = before.left - after.left, dy = before.top - after.top;
-            if (typeof card.animate === 'function') card.animate([{ transform: `translate(${dx}px,${dy}px) scale(.96)` }, { transform: 'translate(0,0) scale(1)' }], { duration: 320, easing: 'cubic-bezier(.22,.8,.3,1)' });
-            feedback.textContent = 'Hey Doctor! Why are you trying to hurt your patient? 😂';
-          };
-          card.addEventListener('pointerenter', event => { if (event.pointerType === 'mouse') dodge() }); card.addEventListener('click', dodge);
-        }
+        card.addEventListener('click', () => openSchedule(medicine, card, state));
         grid.append(card);
       });
       updateSummary();
@@ -297,7 +280,7 @@
       card.append(action('Discharge patient ❤️', completeMission)); root.append(card);
     }
     function completeMission() {
-      if (closed || prescribed.size < medicines.filter(medicine => medicine.type === 'good').length) return;
+      if (closed || prescribed.size < medicines.length) return;
       closed = true;
       options.onComplete?.({
         taskName: options.config?.name || 'The Love Clinic'
